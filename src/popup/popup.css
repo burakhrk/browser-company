@@ -359,6 +359,142 @@ h2 {
   margin-bottom: 8px;
 }
 
+.visual-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.visual-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.visual-grid.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.visual-option {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid rgba(106, 77, 55, 0.12);
+  border-radius: 14px;
+  background: #fffdf9;
+  color: #553827;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+  font: inherit;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.visual-option:hover {
+  transform: translateY(-1px);
+  border-color: rgba(168, 113, 48, 0.2);
+}
+
+.visual-option.is-selected {
+  border-color: rgba(168, 113, 48, 0.35);
+  background: linear-gradient(180deg, #fff5e4, #fffaf4);
+  box-shadow: 0 8px 18px rgba(168, 113, 48, 0.12);
+}
+
+.visual-option strong {
+  font-size: 11px;
+}
+
+.visual-option span {
+  font-size: 10px;
+  line-height: 1.2;
+  color: #7a5b46;
+}
+
+.size-preview {
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffda93, #eaad56);
+}
+
+.size-preview.small {
+  width: 18px;
+  height: 18px;
+}
+
+.size-preview.medium {
+  width: 26px;
+  height: 26px;
+}
+
+.size-preview.large {
+  width: 34px;
+  height: 34px;
+}
+
+.pet-dot,
+.theme-swatch,
+.anchor-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+}
+
+.pet-dot.raccoon {
+  background: linear-gradient(180deg, #e5b384, #be7f54);
+}
+
+.pet-dot.fox {
+  background: linear-gradient(180deg, #f0a86f, #d5754d);
+}
+
+.pet-dot.cat {
+  background: linear-gradient(180deg, #d8c4b4, #b49a87);
+}
+
+.theme-swatch.workshop {
+  background: linear-gradient(135deg, #ffcb75, #77533d 58%, #301d12);
+}
+
+.theme-swatch.sunset {
+  background: linear-gradient(135deg, #ffcf9e, #ff8a65 50%, #3d2019);
+}
+
+.theme-swatch.mint {
+  background: linear-gradient(135deg, #d9ffef, #78d3b0 50%, #23342d);
+}
+
+.anchor-preview {
+  position: relative;
+  background: linear-gradient(180deg, #f2e6d8, #e7d7c6);
+}
+
+.anchor-preview::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffdb97, #efae57);
+}
+
+.anchor-preview.bottom-left::after {
+  left: 5px;
+  bottom: 5px;
+}
+
+.anchor-preview.mid-left::after {
+  left: 5px;
+  top: 11px;
+}
+
+.anchor-preview.mid-right::after {
+  right: 5px;
+  top: 11px;
+}
+
+.anchor-preview.bottom-right::after {
+  right: 5px;
+  bottom: 5px;
+}
+
 .field span,
 .micro-copy {
   color: #6e503e;

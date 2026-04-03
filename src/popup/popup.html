@@ -50,23 +50,41 @@
         <span>Name</span>
         <input id="petName" name="petName" type="text" maxlength="20" placeholder="Momo" />
       </label>
-      <div class="grid two">
-        <label class="field">
-          <span>Personality</span>
-          <select id="personality" name="personality">
-            <option value="hype">Hype</option>
-            <option value="chill">Chill</option>
-            <option value="chaos">Chaos gremlin</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Size</span>
-          <select id="size" name="size">
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
-          </select>
-        </label>
+      <input id="personality" name="personality" type="hidden" value="hype" />
+      <input id="size" name="size" type="hidden" value="medium" />
+      <div class="field">
+        <span>Personality</span>
+        <div class="visual-grid three" data-picker="personality">
+          <button class="visual-option mood-option" data-value="hype" type="button">
+            <strong>Hype</strong>
+            <span>Fast, playful, boosty</span>
+          </button>
+          <button class="visual-option mood-option" data-value="chill" type="button">
+            <strong>Chill</strong>
+            <span>Soft, calm, cozy</span>
+          </button>
+          <button class="visual-option mood-option" data-value="chaos" type="button">
+            <strong>Chaos</strong>
+            <span>Goblin energy</span>
+          </button>
+        </div>
+      </div>
+      <div class="field">
+        <span>Size</span>
+        <div class="visual-grid three" data-picker="size">
+          <button class="visual-option size-option" data-value="small" type="button">
+            <div class="size-preview small"></div>
+            <strong>Small</strong>
+          </button>
+          <button class="visual-option size-option" data-value="medium" type="button">
+            <div class="size-preview medium"></div>
+            <strong>Medium</strong>
+          </button>
+          <button class="visual-option size-option" data-value="large" type="button">
+            <div class="size-preview large"></div>
+            <strong>Large</strong>
+          </button>
+        </div>
       </div>
       <label class="toggle">
         <div>
@@ -111,34 +129,63 @@
           </div>
         </div>
       </div>
-      <div class="grid two">
-        <label class="field">
-          <span>Buddy type</span>
-          <select id="petVariant" name="petVariant">
-            <option value="raccoon">Raccoon</option>
-            <option value="fox">Fox</option>
-            <option value="cat">Cat</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Theme</span>
-          <select id="theme" name="theme">
-            <option value="workshop">Workshop</option>
-            <option value="sunset">Sunset</option>
-            <option value="mint">Mint</option>
-          </select>
-        </label>
+      <input id="petVariant" name="petVariant" type="hidden" value="raccoon" />
+      <input id="theme" name="theme" type="hidden" value="workshop" />
+      <input id="anchor" name="anchor" type="hidden" value="bottom-right" />
+      <div class="field">
+        <span>Buddy type</span>
+        <div class="visual-grid three" data-picker="petVariant">
+          <button class="visual-option pet-card" data-value="raccoon" type="button">
+            <div class="pet-dot raccoon"></div>
+            <strong>Raccoon</strong>
+          </button>
+          <button class="visual-option pet-card" data-value="fox" type="button">
+            <div class="pet-dot fox"></div>
+            <strong>Fox</strong>
+          </button>
+          <button class="visual-option pet-card" data-value="cat" type="button">
+            <div class="pet-dot cat"></div>
+            <strong>Cat</strong>
+          </button>
+        </div>
       </div>
-      <div class="grid two">
-        <label class="field">
-          <span>Default corner</span>
-          <select id="anchor" name="anchor">
-            <option value="bottom-right">Bottom right</option>
-            <option value="bottom-left">Bottom left</option>
-            <option value="mid-right">Mid right</option>
-            <option value="mid-left">Mid left</option>
-          </select>
-        </label>
+      <div class="field">
+        <span>Theme</span>
+        <div class="visual-grid three" data-picker="theme">
+          <button class="visual-option theme-card" data-value="workshop" type="button">
+            <div class="theme-swatch workshop"></div>
+            <strong>Workshop</strong>
+          </button>
+          <button class="visual-option theme-card" data-value="sunset" type="button">
+            <div class="theme-swatch sunset"></div>
+            <strong>Sunset</strong>
+          </button>
+          <button class="visual-option theme-card" data-value="mint" type="button">
+            <div class="theme-swatch mint"></div>
+            <strong>Mint</strong>
+          </button>
+        </div>
+      </div>
+      <div class="field">
+        <span>Default corner</span>
+        <div class="visual-grid four" data-picker="anchor">
+          <button class="visual-option anchor-card" data-value="bottom-left" type="button">
+            <div class="anchor-preview bottom-left"></div>
+            <strong>BL</strong>
+          </button>
+          <button class="visual-option anchor-card" data-value="mid-left" type="button">
+            <div class="anchor-preview mid-left"></div>
+            <strong>ML</strong>
+          </button>
+          <button class="visual-option anchor-card" data-value="mid-right" type="button">
+            <div class="anchor-preview mid-right"></div>
+            <strong>MR</strong>
+          </button>
+          <button class="visual-option anchor-card" data-value="bottom-right" type="button">
+            <div class="anchor-preview bottom-right"></div>
+            <strong>BR</strong>
+          </button>
+        </div>
       </div>
       <label class="toggle">
         <div>

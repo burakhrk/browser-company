@@ -97,6 +97,13 @@ function renderSettings(settings) {
       field.value = settings[fieldName];
     }
   });
+
+  document.querySelectorAll("[data-picker]").forEach((picker) => {
+    const fieldName = picker.dataset.picker;
+    picker.querySelectorAll(".visual-option").forEach((option) => {
+      option.classList.toggle("is-selected", option.dataset.value === String(settings[fieldName]));
+    });
+  });
 }
 
 function collectSettingsFromForm() {
@@ -119,6 +126,22 @@ function bindTabs() {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", () => {
       activateTab(tab.dataset.tab);
+    });
+  });
+}
+
+function bindVisualPickers() {
+  document.querySelectorAll("[data-picker]").forEach((picker) => {
+    const fieldName = picker.dataset.picker;
+    const hiddenField = $(fieldName);
+
+    picker.querySelectorAll(".visual-option").forEach((option) => {
+      option.addEventListener("click", () => {
+        if (hiddenField) {
+          hiddenField.value = option.dataset.value;
+          hiddenField.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
     });
   });
 }
@@ -175,6 +198,7 @@ function bindResetButtons() {
 
 function init() {
   bindTabs();
+  bindVisualPickers();
 
   chrome.storage.local.get(["buddySettings", "buddyStats"], (result) => {
     const settings = merge(DEFAULT_SETTINGS, result.buddySettings);
