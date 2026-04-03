@@ -130,6 +130,27 @@ function collectSettingsFromForm() {
   };
 }
 
+function applySettingsLocally(settings, stats, syncFields = false) {
+  if (syncFields) {
+    renderSettings(settings);
+  }
+  renderHero(settings, stats);
+  renderPreview(settings);
+}
+
+function persistSettings(stats) {
+  chrome.storage.local.get(["buddySettings"], (result) => {
+    const currentSettings = merge(DEFAULT_SETTINGS, result.buddySettings);
+    const nextSettings = {
+      ...currentSettings,
+      ...collectSettingsFromForm()
+    };
+
+    applySettingsLocally(nextSettings, stats, false);
+    chrome.storage.local.set({ buddySettings: nextSettings }, showSavedState);
+  });
+}
+
 function bindTabs() {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -158,19 +179,10 @@ function bindSettings(stats) {
   settingsFields.forEach((fieldName) => {
     const field = $(fieldName);
     if (!field) return;
-    field.addEventListener("change", () => {
-      chrome.storage.local.get(["buddySettings"], (result) => {
-        const currentSettings = merge(DEFAULT_SETTINGS, result.buddySettings);
-        const nextSettings = {
-          ...currentSettings,
-          ...collectSettingsFromForm()
-        };
-        chrome.storage.local.set({ buddySettings: nextSettings }, () => {
-          renderHero(nextSettings, stats);
-          renderPreview(nextSettings);
-          showSavedState();
-        });
-      });
+
+    const eventName = field.type === "text" ? "input" : "change";
+    field.addEventListener(eventName, () => {
+      persistSettings(stats);
     });
   });
 }
