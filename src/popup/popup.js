@@ -3,13 +3,15 @@ const DEFAULT_SETTINGS = {
   petName: "Momo",
   size: "medium",
   theme: "workshop",
+  petVariant: "raccoon",
   anchor: "bottom-right",
   positionMode: "anchor",
   customPosition: null,
   personality: "hype",
   speech: true,
   motivation: true,
-  autoHop: true
+  autoHop: true,
+  roaming: true
 };
 
 const DEFAULT_STATS = {
@@ -25,11 +27,13 @@ const settingsFields = [
   "petName",
   "size",
   "theme",
+  "petVariant",
   "anchor",
   "personality",
   "speech",
   "motivation",
-  "autoHop"
+  "autoHop",
+  "roaming"
 ];
 
 function merge(defaults, value) {
@@ -70,6 +74,12 @@ function renderHero(settings, stats) {
   $("heroPosition").textContent = settings.positionMode === "custom" ? "Manual" : "Corner";
 }
 
+function renderPreview(settings) {
+  const previewCard = $("previewCard");
+  previewCard.dataset.theme = settings.theme;
+  previewCard.dataset.variant = settings.petVariant;
+}
+
 function renderStats(stats) {
   $("pokesValue").textContent = String(stats.pokes || 0);
   $("kicksValue").textContent = String(stats.kicks || 0);
@@ -95,11 +105,13 @@ function collectSettingsFromForm() {
     petName: $("petName").value.trim() || "Momo",
     size: $("size").value,
     theme: $("theme").value,
+    petVariant: $("petVariant").value,
     anchor: $("anchor").value,
     personality: $("personality").value,
     speech: $("speech").checked,
     motivation: $("motivation").checked,
-    autoHop: $("autoHop").checked
+    autoHop: $("autoHop").checked,
+    roaming: $("roaming").checked
   };
 }
 
@@ -124,6 +136,7 @@ function bindSettings(stats) {
         };
         chrome.storage.local.set({ buddySettings: nextSettings }, () => {
           renderHero(nextSettings, stats);
+          renderPreview(nextSettings);
           showSavedState();
         });
       });
@@ -168,6 +181,7 @@ function init() {
     const stats = merge(DEFAULT_STATS, result.buddyStats);
     renderSettings(settings);
     renderHero(settings, stats);
+    renderPreview(settings);
     renderStats(stats);
     bindSettings(stats);
     bindResetButtons();
@@ -179,6 +193,7 @@ function init() {
     if (changes.buddySettings) {
       const nextSettings = merge(DEFAULT_SETTINGS, changes.buddySettings.newValue);
       renderSettings(nextSettings);
+      renderPreview(nextSettings);
       chrome.storage.local.get(["buddyStats"], (result) => {
         renderHero(nextSettings, merge(DEFAULT_STATS, result.buddyStats));
       });

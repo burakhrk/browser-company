@@ -91,7 +91,35 @@
           <h2>Look and movement</h2>
         </div>
       </div>
+      <div class="preview-card" id="previewCard" data-theme="workshop" data-variant="raccoon" data-state="active">
+        <div class="preview-stage">
+          <div class="preview-halo"></div>
+          <div class="preview-raccoon">
+            <div class="preview-tail"></div>
+            <div class="preview-body"></div>
+            <div class="preview-apron"></div>
+            <div class="preview-head">
+              <div class="preview-mask"></div>
+              <div class="preview-eye left"></div>
+              <div class="preview-eye right"></div>
+              <div class="preview-snout"></div>
+            </div>
+            <div class="preview-arm left"></div>
+            <div class="preview-arm right"></div>
+            <div class="preview-leg left"></div>
+            <div class="preview-leg right"></div>
+          </div>
+        </div>
+      </div>
       <div class="grid two">
+        <label class="field">
+          <span>Buddy type</span>
+          <select id="petVariant" name="petVariant">
+            <option value="raccoon">Raccoon</option>
+            <option value="fox">Fox</option>
+            <option value="cat">Cat</option>
+          </select>
+        </label>
         <label class="field">
           <span>Theme</span>
           <select id="theme" name="theme">
@@ -100,6 +128,8 @@
             <option value="mint">Mint</option>
           </select>
         </label>
+      </div>
+      <div class="grid two">
         <label class="field">
           <span>Default corner</span>
           <select id="anchor" name="anchor">
@@ -123,6 +153,13 @@
           <span>Still let the buddy bounce corners when teased.</span>
         </div>
         <input id="autoHop" name="autoHop" type="checkbox" />
+      </label>
+      <label class="toggle">
+        <div>
+          <strong>Roam near home</strong>
+          <span>Let your buddy wander around its chosen spot a little.</span>
+        </div>
+        <input id="roaming" name="roaming" type="checkbox" />
       </label>
       <div class="actions">
         <button id="resetPosition" class="ghost-button" type="button">Reset to corner</button>

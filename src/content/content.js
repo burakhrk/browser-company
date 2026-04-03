@@ -6,13 +6,15 @@ const DEFAULT_SETTINGS = {
   petName: "Momo",
   size: "medium",
   theme: "workshop",
+  petVariant: "raccoon",
   anchor: "bottom-right",
   positionMode: "anchor",
   customPosition: null,
   personality: "hype",
   speech: true,
   motivation: true,
-  autoHop: true
+  autoHop: true,
+  roaming: true
 };
 const DEFAULT_STATS = {
   shinyBits: 0,
@@ -56,6 +58,36 @@ const themeMap = {
   }
 };
 
+const variantMap = {
+  raccoon: {
+    furTop: "#e5b384",
+    furBottom: "#be7f54",
+    bodyTop: "#c88a57",
+    bodyBottom: "#9d6139",
+    mask: "rgba(80, 49, 30, 0.72)",
+    earTop: "#d89d6d",
+    earBottom: "#a86842"
+  },
+  fox: {
+    furTop: "#f0a86f",
+    furBottom: "#d5754d",
+    bodyTop: "#da8850",
+    bodyBottom: "#b35d36",
+    mask: "rgba(120, 58, 26, 0.38)",
+    earTop: "#f0b07e",
+    earBottom: "#c76b3d"
+  },
+  cat: {
+    furTop: "#d8c4b4",
+    furBottom: "#b49a87",
+    bodyTop: "#c9b09b",
+    bodyBottom: "#9f8470",
+    mask: "rgba(93, 74, 60, 0.28)",
+    earTop: "#dbc7b7",
+    earBottom: "#ac917d"
+  }
+};
+
 const sizeMap = {
   small: 0.84,
   medium: 1,
@@ -94,6 +126,7 @@ let currentAnchorIndex = 0;
 let activeDrag = null;
 let pointerWasDrag = false;
 let lastTapAt = 0;
+let cursorPosition = { x: -9999, y: -9999 };
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -140,6 +173,13 @@ function createStyles() {
       --theme-workshop-bottom: #301d12;
       --theme-apron-top: #8fd0c8;
       --theme-apron-bottom: #5aa7a0;
+      --fur-top: #e5b384;
+      --fur-bottom: #be7f54;
+      --body-top: #c88a57;
+      --body-bottom: #9d6139;
+      --mask-color: rgba(80, 49, 30, 0.72);
+      --ear-top: #d89d6d;
+      --ear-bottom: #a86842;
       --buddy-scale: 1;
       position: fixed;
       left: 0;
@@ -156,6 +196,7 @@ function createStyles() {
     }
     .buddy[hidden] { display: none !important; }
     .buddy[data-state="active"] { animation: bounce 1.3s ease-in-out infinite; }
+    .buddy[data-roam="walking"] { animation: stride 0.9s ease-in-out infinite; }
     .buddy[data-state="idle"] .raccoon { animation: breathe 2.8s ease-in-out infinite; }
     .buddy[data-kicked="true"] { transform: rotate(-8deg) scale(calc(var(--buddy-scale) * 0.97)); }
     .buddy[data-dragging="true"] { transition: none; transform: scale(calc(var(--buddy-scale) * 1.03)); filter: drop-shadow(0 24px 36px rgba(35, 18, 8, 0.28)); }
@@ -199,14 +240,14 @@ function createStyles() {
     .buddy[data-mood="proud"] .raccoon { animation: proud 1.2s ease-in-out infinite; }
     .tail { position: absolute; right: -7px; bottom: 8px; width: 28px; height: 46px; border-radius: 18px; background: linear-gradient(180deg, #c18b5e, #8d5b37); transform: rotate(24deg); transform-origin: center bottom; animation: tail 3s ease-in-out infinite; }
     .tail::after { content: ""; position: absolute; inset: 7px 5px 6px 5px; border-radius: 14px; background: repeating-linear-gradient(180deg, rgba(91, 50, 26, 0.85) 0 6px, rgba(242, 216, 185, 0.75) 6px 12px); }
-    .body { position: absolute; left: 12px; bottom: 0; width: 52px; height: 46px; border-radius: 22px 22px 18px 18px; background: linear-gradient(180deg, #c88a57, #9d6139); box-shadow: inset 0 3px 0 rgba(255, 231, 199, 0.18); }
+    .body { position: absolute; left: 12px; bottom: 0; width: 52px; height: 46px; border-radius: 22px 22px 18px 18px; background: linear-gradient(180deg, var(--body-top), var(--body-bottom)); box-shadow: inset 0 3px 0 rgba(255, 231, 199, 0.18); }
     .apron { position: absolute; left: 18px; bottom: 7px; width: 40px; height: 32px; border-radius: 16px; background: linear-gradient(180deg, var(--theme-apron-top), var(--theme-apron-bottom)); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2); }
-    .head { position: absolute; left: 16px; top: 6px; width: 46px; height: 42px; border-radius: 22px; background: linear-gradient(180deg, #e5b384, #be7f54); box-shadow: inset 0 3px 0 rgba(255, 235, 210, 0.24); transform-origin: center bottom; }
+    .head { position: absolute; left: 16px; top: 6px; width: 46px; height: 42px; border-radius: 22px; background: linear-gradient(180deg, var(--fur-top), var(--fur-bottom)); box-shadow: inset 0 3px 0 rgba(255, 235, 210, 0.24); transform-origin: center bottom; }
     .buddy[data-state="active"] .head { animation: nod 0.9s ease-in-out infinite; }
-    .head::before, .head::after { content: ""; position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 4px 16px 5px 16px; background: linear-gradient(180deg, #d89d6d, #a86842); }
+    .head::before, .head::after { content: ""; position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 4px 16px 5px 16px; background: linear-gradient(180deg, var(--ear-top), var(--ear-bottom)); }
     .head::before { left: 4px; transform: rotate(-24deg); }
     .head::after { right: 4px; transform: scaleX(-1) rotate(-24deg); }
-    .mask { position: absolute; left: 9px; top: 10px; width: 28px; height: 14px; border-radius: 999px; background: rgba(80, 49, 30, 0.72); }
+    .mask { position: absolute; left: 9px; top: 10px; width: 28px; height: 14px; border-radius: 999px; background: var(--mask-color); }
     .eye { position: absolute; top: 14px; width: 7px; height: 10px; border-radius: 999px; background: #1d1008; transform-origin: center center; transition: transform 140ms ease; }
     .eye.left { left: 16px; }
     .eye.right { right: 15px; }
@@ -277,6 +318,7 @@ function createStyles() {
     @keyframes right-arm { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-52deg) translateY(-2px); } }
     @keyframes left-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(9deg); } }
     @keyframes right-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg); } }
+    @keyframes stride { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
   `;
 }
 
@@ -344,6 +386,20 @@ function mountBuddy() {
   let bubbleTimer = null;
   let rewardTimer = 0;
   let intervalId = null;
+  let roamingTimer = null;
+  let homePosition = { x: 0, y: 0 };
+
+  function getBuddyPosition() {
+    return {
+      x: parseFloat(buddy.style.left || "0"),
+      y: parseFloat(buddy.style.top || "0")
+    };
+  }
+
+  function setBuddyPosition(nextPosition) {
+    buddy.style.left = `${nextPosition.x}px`;
+    buddy.style.top = `${nextPosition.y}px`;
+  }
 
   function showMessage(text, duration = 1500) {
     if (!settings.speech && duration !== 0) return;
@@ -361,6 +417,7 @@ function mountBuddy() {
   function applySettings() {
     currentAnchorIndex = getAnchorIndexByName(settings.anchor);
     const theme = themeMap[settings.theme] || themeMap.workshop;
+    const variant = variantMap[settings.petVariant] || variantMap.raccoon;
     const scale = sizeMap[settings.size] || sizeMap.medium;
     const nextPosition = settings.positionMode === "custom" && settings.customPosition
       ? {
@@ -370,8 +427,8 @@ function mountBuddy() {
       : resolveAnchorPosition(currentAnchorIndex);
 
     buddy.hidden = !settings.enabled;
-    buddy.style.left = `${nextPosition.x}px`;
-    buddy.style.top = `${nextPosition.y}px`;
+    setBuddyPosition(nextPosition);
+    homePosition = { ...nextPosition };
     buddy.style.setProperty("--buddy-scale", scale);
     buddy.style.setProperty("--theme-accent", theme.accent);
     buddy.style.setProperty("--theme-accent-soft", theme.accentSoft);
@@ -379,6 +436,13 @@ function mountBuddy() {
     buddy.style.setProperty("--theme-workshop-bottom", theme.workshopBottom);
     buddy.style.setProperty("--theme-apron-top", theme.apronTop);
     buddy.style.setProperty("--theme-apron-bottom", theme.apronBottom);
+    buddy.style.setProperty("--fur-top", variant.furTop);
+    buddy.style.setProperty("--fur-bottom", variant.furBottom);
+    buddy.style.setProperty("--body-top", variant.bodyTop);
+    buddy.style.setProperty("--body-bottom", variant.bodyBottom);
+    buddy.style.setProperty("--mask-color", variant.mask);
+    buddy.style.setProperty("--ear-top", variant.earTop);
+    buddy.style.setProperty("--ear-bottom", variant.earBottom);
     buddy.title = settings.petName;
     buddy.dataset.mood = "calm";
   }
@@ -420,8 +484,8 @@ function mountBuddy() {
     settings.customPosition = null;
     saveSettings();
     const nextPosition = resolveAnchorPosition(anchorIndex);
-    buddy.style.left = `${nextPosition.x}px`;
-    buddy.style.top = `${nextPosition.y}px`;
+    setBuddyPosition(nextPosition);
+    homePosition = { ...nextPosition };
     buddy.dataset.kicked = "true";
     buddy.dataset.mood = "annoyed";
 
@@ -473,6 +537,52 @@ function mountBuddy() {
     activityUntil = Date.now() + ACTIVITY_WINDOW_MS;
   }
 
+  function nudgeFromCursor() {
+    const currentPosition = getBuddyPosition();
+    const centerX = currentPosition.x + buddy.offsetWidth / 2;
+    const centerY = currentPosition.y + buddy.offsetHeight / 2;
+    const dx = centerX - cursorPosition.x;
+    const dy = centerY - cursorPosition.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (distance > 120 || distance < 0.001) return;
+
+    const push = (120 - distance) / 120 * 26;
+    const nextX = clamp(currentPosition.x + (dx / distance) * push, 8, window.innerWidth - buddy.offsetWidth - 8);
+    const nextY = clamp(currentPosition.y + (dy / distance) * push, 8, window.innerHeight - buddy.offsetHeight - 8);
+    setBuddyPosition({ x: nextX, y: nextY });
+    buddy.dataset.mood = "annoyed";
+    buddy.dataset.roam = "walking";
+  }
+
+  function roamNearHome() {
+    if (!settings.enabled || !settings.roaming || activeDrag) return;
+    if (Date.now() < activityUntil || rewardReady) {
+      buddy.dataset.roam = "idle";
+      return;
+    }
+
+    const maxOffsetX = settings.positionMode === "custom" ? 34 : 22;
+    const maxOffsetY = 16;
+    const target = {
+      x: clamp(homePosition.x + Math.round((Math.random() * 2 - 1) * maxOffsetX), 8, window.innerWidth - buddy.offsetWidth - 8),
+      y: clamp(homePosition.y + Math.round((Math.random() * 2 - 1) * maxOffsetY), 8, window.innerHeight - buddy.offsetHeight - 8)
+    };
+
+    const currentPosition = getBuddyPosition();
+    buddy.dataset.roam = "walking";
+    buddy.style.transform = `${target.x < currentPosition.x ? "scaleX(-1) " : ""}scale(var(--buddy-scale))`;
+    setBuddyPosition(target);
+
+    window.setTimeout(() => {
+      buddy.dataset.roam = "idle";
+      if (settings.positionMode === "custom") {
+        setBuddyPosition(homePosition);
+        buddy.style.transform = "scale(var(--buddy-scale))";
+      }
+    }, 900);
+  }
+
   function onPointerDown(event) {
     pointerWasDrag = false;
     const rect = buddy.getBoundingClientRect();
@@ -491,8 +601,7 @@ function mountBuddy() {
     pointerWasDrag = true;
     const nextX = clamp(event.clientX - activeDrag.offsetX, 8, window.innerWidth - buddy.offsetWidth - 8);
     const nextY = clamp(event.clientY - activeDrag.offsetY, 8, window.innerHeight - buddy.offsetHeight - 8);
-    buddy.style.left = `${nextX}px`;
-    buddy.style.top = `${nextY}px`;
+    setBuddyPosition({ x: nextX, y: nextY });
   }
 
   function onPointerUp(event) {
@@ -509,6 +618,7 @@ function mountBuddy() {
     const currentTop = parseFloat(buddy.style.top || "0");
     settings.positionMode = "custom";
     settings.customPosition = { x: currentLeft, y: currentTop };
+    homePosition = { x: currentLeft, y: currentTop };
     saveSettings();
     buddy.dataset.mood = "proud";
     showMessage("Nice. I live here now.", 1100);
@@ -523,6 +633,9 @@ function mountBuddy() {
       if (intervalId === null) {
         intervalId = window.setInterval(updateVisualState, 140);
         updateVisualState();
+      }
+      if (roamingTimer === null) {
+        roamingTimer = window.setInterval(roamNearHome, 2800);
       }
     });
 
@@ -594,6 +707,13 @@ function mountBuddy() {
     window.addEventListener(eventName, markActivity, { passive: true });
   });
 
+  window.addEventListener("mousemove", (event) => {
+    cursorPosition = { x: event.clientX, y: event.clientY };
+    if (!activeDrag) {
+      nudgeFromCursor();
+    }
+  }, { passive: true });
+
   window.addEventListener("resize", () => {
     const nextPosition = settings.positionMode === "custom" && settings.customPosition
       ? {
@@ -601,8 +721,8 @@ function mountBuddy() {
           y: clamp(settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
         }
       : resolveAnchorPosition(currentAnchorIndex);
-    buddy.style.left = `${nextPosition.x}px`;
-    buddy.style.top = `${nextPosition.y}px`;
+    setBuddyPosition(nextPosition);
+    homePosition = { ...nextPosition };
   });
 
   setupStorageSync();

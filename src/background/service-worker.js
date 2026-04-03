@@ -3,13 +3,15 @@ const DEFAULT_SETTINGS = {
   petName: "Momo",
   size: "medium",
   theme: "workshop",
+  petVariant: "raccoon",
   anchor: "bottom-right",
   positionMode: "anchor",
   customPosition: null,
   personality: "hype",
   speech: true,
   motivation: true,
-  autoHop: true
+  autoHop: true,
+  roaming: true
 };
 
 const DEFAULT_STATS = {
