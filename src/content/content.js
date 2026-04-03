@@ -192,6 +192,9 @@ function createStyles() {
     .raccoon { position: absolute; left: 31px; bottom: 36px; width: 78px; height: 82px; transition: transform 180ms ease; transform-origin: center bottom; }
     .buddy[data-state="active"] .raccoon { animation: work 0.9s ease-in-out infinite; }
     .buddy[data-state="reward"] .raccoon { transform: translateY(-4px); }
+    .buddy[data-mood="sleepy"] .raccoon { animation: sleepy 3.6s ease-in-out infinite; }
+    .buddy[data-mood="annoyed"] .raccoon { animation: shake 0.28s ease-in-out 2; }
+    .buddy[data-mood="proud"] .raccoon { animation: proud 1.2s ease-in-out infinite; }
     .tail { position: absolute; right: -7px; bottom: 8px; width: 28px; height: 46px; border-radius: 18px; background: linear-gradient(180deg, #c18b5e, #8d5b37); transform: rotate(24deg); transform-origin: center bottom; animation: tail 3s ease-in-out infinite; }
     .tail::after { content: ""; position: absolute; inset: 7px 5px 6px 5px; border-radius: 14px; background: repeating-linear-gradient(180deg, rgba(91, 50, 26, 0.85) 0 6px, rgba(242, 216, 185, 0.75) 6px 12px); }
     .body { position: absolute; left: 12px; bottom: 0; width: 52px; height: 46px; border-radius: 22px 22px 18px 18px; background: linear-gradient(180deg, #c88a57, #9d6139); box-shadow: inset 0 3px 0 rgba(255, 231, 199, 0.18); }
@@ -205,8 +208,30 @@ function createStyles() {
     .eye.left { left: 16px; }
     .eye.right { right: 15px; }
     .buddy[data-state="idle"] .eye { animation: blink 4s ease-in-out infinite; }
+    .buddy[data-mood="focused"] .eye { transform: scaleY(0.85) translateY(1px); }
+    .buddy[data-mood="sleepy"] .eye { transform: scaleY(0.25) translateY(2px); }
+    .buddy[data-mood="annoyed"] .eye { transform: scaleY(0.8); }
+    .brow { position: absolute; top: 10px; width: 12px; height: 3px; border-radius: 999px; background: rgba(63, 36, 17, 0.78); transition: transform 160ms ease; }
+    .brow.left { left: 13px; transform: rotate(-8deg); }
+    .brow.right { right: 12px; transform: rotate(8deg); }
+    .buddy[data-mood="focused"] .brow.left { transform: translateY(1px) rotate(10deg); }
+    .buddy[data-mood="focused"] .brow.right { transform: translateY(1px) rotate(-10deg); }
+    .buddy[data-mood="annoyed"] .brow.left { transform: translateY(-1px) rotate(18deg); }
+    .buddy[data-mood="annoyed"] .brow.right { transform: translateY(-1px) rotate(-18deg); }
+    .buddy[data-mood="sleepy"] .brow.left,
+    .buddy[data-mood="sleepy"] .brow.right { transform: translateY(2px) rotate(0deg); }
     .snout { position: absolute; left: 14px; bottom: 7px; width: 20px; height: 13px; border-radius: 999px; background: #f7e2cb; }
     .snout::after { content: ""; position: absolute; left: 8px; top: 2px; width: 4px; height: 4px; border-radius: 999px; background: #543120; }
+    .mouth { position: absolute; left: 18px; bottom: 4px; width: 10px; height: 6px; border-radius: 0 0 10px 10px; border-bottom: 2px solid #6e4632; }
+    .buddy[data-mood="sleepy"] .mouth { width: 8px; height: 2px; border-bottom-width: 1px; }
+    .buddy[data-mood="annoyed"] .mouth { border-bottom: 0; border-top: 2px solid #6e4632; border-radius: 10px 10px 0 0; bottom: 6px; }
+    .buddy[data-mood="proud"] .mouth,
+    .buddy[data-state="reward"] .mouth { width: 12px; border-bottom-width: 3px; }
+    .blush { position: absolute; top: 22px; width: 8px; height: 5px; border-radius: 999px; background: rgba(255, 174, 132, 0.4); opacity: 0; transition: opacity 180ms ease; }
+    .blush.left { left: 9px; }
+    .blush.right { right: 8px; }
+    .buddy[data-mood="proud"] .blush,
+    .buddy[data-state="reward"] .blush { opacity: 1; }
     .goggles { position: absolute; left: 11px; top: 7px; width: 26px; height: 8px; border-radius: 999px; background: #494845; }
     .goggles::before, .goggles::after { content: ""; position: absolute; top: -1px; width: 11px; height: 11px; border-radius: 999px; background: linear-gradient(180deg, rgba(175, 224, 255, 0.9), rgba(105, 154, 188, 0.9)); border: 2px solid #40403e; }
     .goggles::before { left: -1px; }
@@ -222,6 +247,10 @@ function createStyles() {
     .crate::after { bottom: 7px; }
     .coin { position: absolute; right: 24px; bottom: 54px; width: 20px; height: 20px; border-radius: 999px; background: radial-gradient(circle at 30% 30%, #fff1b0, #f3b03e 70%, #a66a13); border: 2px solid rgba(255, 236, 190, 0.35); opacity: 0; transform: scale(0.6); transition: opacity 180ms ease, transform 180ms ease; }
     .buddy[data-state="reward"] .coin { opacity: 1; transform: scale(1); animation: pulse 1.1s ease-in-out infinite; }
+    .halo { position: absolute; left: 34px; top: 6px; width: 54px; height: 54px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 227, 151, 0.32), rgba(255, 227, 151, 0)); opacity: 0; transform: scale(0.75); transition: opacity 220ms ease, transform 220ms ease; }
+    .buddy[data-state="reward"] .halo { opacity: 1; transform: scale(1); }
+    .zzz { position: absolute; right: 24px; top: 18px; color: rgba(255, 250, 241, 0.86); font: 700 13px/1 "Segoe UI", sans-serif; letter-spacing: 0.04em; opacity: 0; transform: translateY(3px); transition: opacity 180ms ease, transform 180ms ease; }
+    .buddy[data-mood="sleepy"] .zzz { opacity: 1; transform: translateY(0); }
     .shadow { position: absolute; left: 23px; bottom: 16px; width: 76px; height: 18px; border-radius: 999px; background: rgba(33, 18, 10, 0.18); filter: blur(6px); }
     @keyframes breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(1px) scale(0.985); } }
     @keyframes work { 0%, 100% { transform: rotate(0deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(-2px); } }
@@ -230,6 +259,9 @@ function createStyles() {
     @keyframes spark { 0%, 100% { transform: translateY(0) scale(0.7); opacity: 0.1; } 50% { transform: translateY(-10px) scale(1); opacity: 1; } }
     @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
     @keyframes tail { 0%, 100% { transform: rotate(24deg); } 50% { transform: rotate(17deg); } }
+    @keyframes sleepy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px) rotate(-2deg); } 75% { transform: translateX(2px) rotate(2deg); } }
+    @keyframes proud { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(-7px); } }
   `;
 }
 
@@ -241,10 +273,12 @@ function createMarkup() {
       <div class="scene">
         <div class="sparkles"><div class="spark"></div><div class="spark"></div><div class="spark"></div></div>
         <div class="shadow"></div>
+        <div class="halo"></div>
+        <div class="zzz">Zz</div>
         <div class="workshop"><div class="crate"></div><div class="coin"></div><div class="progress"><div class="progress-fill"></div></div></div>
         <div class="raccoon">
           <div class="tail"></div><div class="body"></div><div class="apron"></div>
-          <div class="head"><div class="mask"></div><div class="goggles"></div><div class="eye left"></div><div class="eye right"></div><div class="snout"></div></div>
+          <div class="head"><div class="mask"></div><div class="goggles"></div><div class="brow left"></div><div class="brow right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="snout"></div><div class="mouth"></div></div>
           <div class="arm left"></div><div class="arm right"></div><div class="tool"></div>
         </div>
       </div>
@@ -326,6 +360,7 @@ function mountBuddy() {
     buddy.style.setProperty("--theme-apron-top", theme.apronTop);
     buddy.style.setProperty("--theme-apron-bottom", theme.apronBottom);
     buddy.title = settings.petName;
+    buddy.dataset.mood = "calm";
   }
 
   function updateVisualState() {
@@ -334,6 +369,7 @@ function mountBuddy() {
 
     if (rewardReady) {
       buddy.dataset.state = "reward";
+      buddy.dataset.mood = "proud";
       progressFill.style.width = "100%";
       return;
     }
@@ -341,9 +377,11 @@ function mountBuddy() {
     if (isActive) {
       momentum = Math.min(100, momentum + 1.2);
       buddy.dataset.state = "active";
+      buddy.dataset.mood = momentum > 72 ? "focused" : "calm";
     } else {
       momentum = Math.max(8, momentum - 0.7);
       buddy.dataset.state = "idle";
+      buddy.dataset.mood = momentum < 24 ? "sleepy" : "calm";
     }
 
     progressFill.style.width = `${momentum}%`;
@@ -363,9 +401,17 @@ function mountBuddy() {
     buddy.style.left = `${nextPosition.x}px`;
     buddy.style.top = `${nextPosition.y}px`;
     buddy.dataset.kicked = "true";
+    buddy.dataset.mood = "annoyed";
 
     window.setTimeout(() => {
       buddy.dataset.kicked = "false";
+      if (buddy.dataset.state === "reward") {
+        buddy.dataset.mood = "proud";
+      } else if (buddy.dataset.state === "active") {
+        buddy.dataset.mood = "focused";
+      } else {
+        buddy.dataset.mood = "calm";
+      }
     }, 250);
 
     if (announceText) {
@@ -396,6 +442,7 @@ function mountBuddy() {
     stats = bumpStat(stats, "rewardsCollected");
     stats = bumpStat(stats, "shinyBits", 8);
     buddy.dataset.state = "active";
+    buddy.dataset.mood = "proud";
     progressFill.style.width = `${momentum}%`;
     showMessage(pickLine(settings.personality, "collect"), 1600);
   }
@@ -501,6 +548,16 @@ function mountBuddy() {
     if (now - lastTapAt < CLICK_KICK_THRESHOLD) {
       kickToAnotherSpot();
     } else {
+      buddy.dataset.mood = "annoyed";
+      window.setTimeout(() => {
+        if (buddy.dataset.state === "reward") {
+          buddy.dataset.mood = "proud";
+        } else if (Date.now() < activityUntil) {
+          buddy.dataset.mood = "focused";
+        } else {
+          buddy.dataset.mood = "calm";
+        }
+      }, 420);
       showMessage(pickLine(settings.personality, "poke"), 1200);
     }
     lastTapAt = now;
