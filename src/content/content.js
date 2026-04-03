@@ -7,6 +7,8 @@ const DEFAULT_SETTINGS = {
   size: "medium",
   theme: "workshop",
   anchor: "bottom-right",
+  positionMode: "anchor",
+  customPosition: null,
   personality: "hype",
   speech: true,
   motivation: true,
@@ -199,7 +201,8 @@ function createStyles() {
     .tail::after { content: ""; position: absolute; inset: 7px 5px 6px 5px; border-radius: 14px; background: repeating-linear-gradient(180deg, rgba(91, 50, 26, 0.85) 0 6px, rgba(242, 216, 185, 0.75) 6px 12px); }
     .body { position: absolute; left: 12px; bottom: 0; width: 52px; height: 46px; border-radius: 22px 22px 18px 18px; background: linear-gradient(180deg, #c88a57, #9d6139); box-shadow: inset 0 3px 0 rgba(255, 231, 199, 0.18); }
     .apron { position: absolute; left: 18px; bottom: 7px; width: 40px; height: 32px; border-radius: 16px; background: linear-gradient(180deg, var(--theme-apron-top), var(--theme-apron-bottom)); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2); }
-    .head { position: absolute; left: 16px; top: 6px; width: 46px; height: 42px; border-radius: 22px; background: linear-gradient(180deg, #e5b384, #be7f54); box-shadow: inset 0 3px 0 rgba(255, 235, 210, 0.24); }
+    .head { position: absolute; left: 16px; top: 6px; width: 46px; height: 42px; border-radius: 22px; background: linear-gradient(180deg, #e5b384, #be7f54); box-shadow: inset 0 3px 0 rgba(255, 235, 210, 0.24); transform-origin: center bottom; }
+    .buddy[data-state="active"] .head { animation: nod 0.9s ease-in-out infinite; }
     .head::before, .head::after { content: ""; position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 4px 16px 5px 16px; background: linear-gradient(180deg, #d89d6d, #a86842); }
     .head::before { left: 4px; transform: rotate(-24deg); }
     .head::after { right: 4px; transform: scaleX(-1) rotate(-24deg); }
@@ -239,6 +242,13 @@ function createStyles() {
     .arm { position: absolute; top: 42px; width: 12px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #da9f73, #b9784a); transform-origin: top center; }
     .arm.left { left: 14px; transform: rotate(18deg); }
     .arm.right { right: 8px; transform: rotate(-22deg); }
+    .buddy[data-state="active"] .arm.left { animation: left-arm 0.72s ease-in-out infinite; }
+    .buddy[data-state="active"] .arm.right { animation: right-arm 0.72s ease-in-out infinite; }
+    .leg { position: absolute; bottom: -4px; width: 10px; height: 18px; border-radius: 999px; background: linear-gradient(180deg, #9d6139, #734525); transform-origin: top center; }
+    .leg.left { left: 21px; }
+    .leg.right { left: 39px; }
+    .buddy[data-state="active"] .leg.left { animation: left-leg 0.8s ease-in-out infinite; }
+    .buddy[data-state="active"] .leg.right { animation: right-leg 0.8s ease-in-out infinite; }
     .tool { position: absolute; right: -4px; top: 53px; width: 26px; height: 7px; border-radius: 999px; background: #7c604d; transform: rotate(-24deg); }
     .tool::after { content: ""; position: absolute; right: -3px; top: -6px; width: 14px; height: 16px; border-radius: 5px; background: linear-gradient(180deg, #f0f3f6, #96a1a8); }
     .crate { position: absolute; right: 16px; bottom: 28px; width: 30px; height: 26px; border-radius: 9px; background: linear-gradient(180deg, #9b6a43, #6e4327); box-shadow: inset 0 2px 0 rgba(255, 244, 222, 0.16); }
@@ -262,6 +272,11 @@ function createStyles() {
     @keyframes sleepy { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px) rotate(-2deg); } 75% { transform: translateX(2px) rotate(2deg); } }
     @keyframes proud { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(-7px); } }
+    @keyframes nod { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-5deg) translateY(1px); } }
+    @keyframes left-arm { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(40deg) translateY(-1px); } }
+    @keyframes right-arm { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-52deg) translateY(-2px); } }
+    @keyframes left-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(9deg); } }
+    @keyframes right-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg); } }
   `;
 }
 
@@ -279,7 +294,7 @@ function createMarkup() {
         <div class="raccoon">
           <div class="tail"></div><div class="body"></div><div class="apron"></div>
           <div class="head"><div class="mask"></div><div class="goggles"></div><div class="brow left"></div><div class="brow right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="snout"></div><div class="mouth"></div></div>
-          <div class="arm left"></div><div class="arm right"></div><div class="tool"></div>
+          <div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div><div class="tool"></div>
         </div>
       </div>
     </div>
@@ -347,7 +362,12 @@ function mountBuddy() {
     currentAnchorIndex = getAnchorIndexByName(settings.anchor);
     const theme = themeMap[settings.theme] || themeMap.workshop;
     const scale = sizeMap[settings.size] || sizeMap.medium;
-    const nextPosition = resolveAnchorPosition(currentAnchorIndex);
+    const nextPosition = settings.positionMode === "custom" && settings.customPosition
+      ? {
+          x: clamp(settings.customPosition.x, 8, window.innerWidth - buddy.offsetWidth - 8),
+          y: clamp(settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
+        }
+      : resolveAnchorPosition(currentAnchorIndex);
 
     buddy.hidden = !settings.enabled;
     buddy.style.left = `${nextPosition.x}px`;
@@ -396,6 +416,8 @@ function mountBuddy() {
   function moveToAnchor(anchorIndex, announceText) {
     currentAnchorIndex = anchorIndex;
     settings.anchor = anchorPositions[anchorIndex].name;
+    settings.positionMode = "anchor";
+    settings.customPosition = null;
     saveSettings();
     const nextPosition = resolveAnchorPosition(anchorIndex);
     buddy.style.left = `${nextPosition.x}px`;
@@ -483,23 +505,13 @@ function mountBuddy() {
     if (!pointerWasDrag) return;
 
     stats = bumpStat(stats, "drags");
-
-    const rect = buddy.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const nearestIndex = anchorPositions.reduce((bestIndex, anchor, index) => {
-      const pointX = anchor.x();
-      const pointY = anchor.y();
-      const bestPoint = anchorPositions[bestIndex];
-      const bestX = bestPoint.x();
-      const bestY = bestPoint.y();
-      const nextDistance = Math.hypot(centerX - pointX, centerY - pointY);
-      const bestDistance = Math.hypot(centerX - bestX, centerY - bestY);
-      return nextDistance < bestDistance ? index : bestIndex;
-    }, currentAnchorIndex);
-
-    moveToAnchor(nearestIndex, "New spot, same tiny grind.");
+    const currentLeft = parseFloat(buddy.style.left || "0");
+    const currentTop = parseFloat(buddy.style.top || "0");
+    settings.positionMode = "custom";
+    settings.customPosition = { x: currentLeft, y: currentTop };
+    saveSettings();
+    buddy.dataset.mood = "proud";
+    showMessage("Nice. I live here now.", 1100);
   }
 
   function setupStorageSync() {
@@ -583,7 +595,12 @@ function mountBuddy() {
   });
 
   window.addEventListener("resize", () => {
-    const nextPosition = resolveAnchorPosition(currentAnchorIndex);
+    const nextPosition = settings.positionMode === "custom" && settings.customPosition
+      ? {
+          x: clamp(settings.customPosition.x, 8, window.innerWidth - buddy.offsetWidth - 8),
+          y: clamp(settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
+        }
+      : resolveAnchorPosition(currentAnchorIndex);
     buddy.style.left = `${nextPosition.x}px`;
     buddy.style.top = `${nextPosition.y}px`;
   });

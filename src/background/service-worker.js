@@ -4,6 +4,8 @@ const DEFAULT_SETTINGS = {
   size: "medium",
   theme: "workshop",
   anchor: "bottom-right",
+  positionMode: "anchor",
+  customPosition: null,
   personality: "hype",
   speech: true,
   motivation: true,

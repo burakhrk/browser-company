@@ -4,6 +4,8 @@ const DEFAULT_SETTINGS = {
   size: "medium",
   theme: "workshop",
   anchor: "bottom-right",
+  positionMode: "anchor",
+  customPosition: null,
   personality: "hype",
   speech: true,
   motivation: true,
@@ -50,10 +52,22 @@ function showSavedState() {
   }, 1000);
 }
 
+function activateTab(tabName) {
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.classList.toggle("is-active", tab.dataset.tab === tabName);
+  });
+  document.querySelectorAll(".panel").forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.panel === tabName);
+  });
+}
+
 function renderHero(settings, stats) {
-  $("heroName").textContent = settings.petName || "Momo";
+  $("heroTitle").textContent = `${settings.petName || "Momo"} is on shift.`;
   $("heroBits").textContent = String(stats.shinyBits || 0);
-  $("heroMood").textContent = settings.personality === "chaos" ? "Chaos" : settings.personality === "chill" ? "Chill" : "Hype";
+  $("heroRewards").textContent = String(stats.rewardsCollected || 0);
+  $("heroMood").textContent =
+    settings.personality === "chaos" ? "Chaos" : settings.personality === "chill" ? "Chill" : "Hype";
+  $("heroPosition").textContent = settings.positionMode === "custom" ? "Manual" : "Corner";
 }
 
 function renderStats(stats) {
@@ -89,31 +103,66 @@ function collectSettingsFromForm() {
   };
 }
 
+function bindTabs() {
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      activateTab(tab.dataset.tab);
+    });
+  });
+}
+
 function bindSettings(stats) {
   settingsFields.forEach((fieldName) => {
     const field = $(fieldName);
     if (!field) return;
     field.addEventListener("change", () => {
-      const nextSettings = collectSettingsFromForm();
-      chrome.storage.local.set({ buddySettings: nextSettings }, () => {
-        renderHero(nextSettings, stats);
-        showSavedState();
+      chrome.storage.local.get(["buddySettings"], (result) => {
+        const currentSettings = merge(DEFAULT_SETTINGS, result.buddySettings);
+        const nextSettings = {
+          ...currentSettings,
+          ...collectSettingsFromForm()
+        };
+        chrome.storage.local.set({ buddySettings: nextSettings }, () => {
+          renderHero(nextSettings, stats);
+          showSavedState();
+        });
       });
     });
   });
 }
 
-function bindReset() {
+function bindResetButtons() {
   $("resetStats").addEventListener("click", () => {
     chrome.storage.local.set({ buddyStats: { ...DEFAULT_STATS } }, () => {
       renderStats(DEFAULT_STATS);
-      renderHero(collectSettingsFromForm(), DEFAULT_STATS);
+      chrome.storage.local.get(["buddySettings"], (result) => {
+        renderHero(merge(DEFAULT_SETTINGS, result.buddySettings), DEFAULT_STATS);
+      });
       showSavedState();
+    });
+  });
+
+  $("resetPosition").addEventListener("click", () => {
+    chrome.storage.local.get(["buddySettings"], (result) => {
+      const currentSettings = merge(DEFAULT_SETTINGS, result.buddySettings);
+      const nextSettings = {
+        ...currentSettings,
+        positionMode: "anchor",
+        customPosition: null
+      };
+      chrome.storage.local.set({ buddySettings: nextSettings }, () => {
+        chrome.storage.local.get(["buddyStats"], (statsResult) => {
+          renderHero(nextSettings, merge(DEFAULT_STATS, statsResult.buddyStats));
+          showSavedState();
+        });
+      });
     });
   });
 }
 
 function init() {
+  bindTabs();
+
   chrome.storage.local.get(["buddySettings", "buddyStats"], (result) => {
     const settings = merge(DEFAULT_SETTINGS, result.buddySettings);
     const stats = merge(DEFAULT_STATS, result.buddyStats);
@@ -121,11 +170,12 @@ function init() {
     renderHero(settings, stats);
     renderStats(stats);
     bindSettings(stats);
-    bindReset();
+    bindResetButtons();
   });
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "local") return;
+
     if (changes.buddySettings) {
       const nextSettings = merge(DEFAULT_SETTINGS, changes.buddySettings.newValue);
       renderSettings(nextSettings);
@@ -133,6 +183,7 @@ function init() {
         renderHero(nextSettings, merge(DEFAULT_STATS, result.buddyStats));
       });
     }
+
     if (changes.buddyStats) {
       const nextStats = merge(DEFAULT_STATS, changes.buddyStats.newValue);
       renderStats(nextStats);

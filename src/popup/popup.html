@@ -9,30 +9,41 @@
 <body>
   <main class="popup">
     <section class="hero card">
-      <p class="eyebrow">Browser Buddy</p>
-      <h1>Your tiny browser company is online.</h1>
-      <p class="copy">Friendly little work buddy, zero guilt, just vibes and momentum.</p>
-      <div class="hero-stats">
+      <div class="hero-top">
         <div>
-          <span class="stat-label">Buddy</span>
-          <strong id="heroName">Momo</strong>
+          <p class="eyebrow">Browser Buddy</p>
+          <h1 id="heroTitle">Momo is on shift.</h1>
         </div>
+        <div class="buddy-chip" id="heroMood">Hype</div>
+      </div>
+      <p class="copy">Tiny browser company, friendly chaos, zero guilt.</p>
+      <div class="hero-stats">
         <div>
           <span class="stat-label">Shiny bits</span>
           <strong id="heroBits">0</strong>
         </div>
         <div>
-          <span class="stat-label">Mood</span>
-          <strong id="heroMood">Hype</strong>
+          <span class="stat-label">Rewards</span>
+          <strong id="heroRewards">0</strong>
+        </div>
+        <div>
+          <span class="stat-label">Position</span>
+          <strong id="heroPosition">Corner</strong>
         </div>
       </div>
     </section>
 
-    <section class="card section">
+    <nav class="tabs" aria-label="Buddy sections">
+      <button class="tab is-active" data-tab="profile" type="button">Profile</button>
+      <button class="tab" data-tab="customize" type="button">Customize</button>
+      <button class="tab" data-tab="analytics" type="button">Analytics</button>
+    </nav>
+
+    <section class="panel card is-active" data-panel="profile">
       <div class="section-head">
         <div>
           <p class="section-kicker">Profile</p>
-          <h2>Make it yours</h2>
+          <h2>Buddy basics</h2>
         </div>
       </div>
       <label class="field">
@@ -57,6 +68,29 @@
           </select>
         </label>
       </div>
+      <label class="toggle">
+        <div>
+          <strong>Show buddy on pages</strong>
+          <span>Keep your tiny co-worker visible while browsing.</span>
+        </div>
+        <input id="enabled" name="enabled" type="checkbox" />
+      </label>
+      <label class="toggle">
+        <div>
+          <strong>Speech bubbles</strong>
+          <span>Goofy little comments and reactions.</span>
+        </div>
+        <input id="speech" name="speech" type="checkbox" />
+      </label>
+    </section>
+
+    <section class="panel card" data-panel="customize">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Customize</p>
+          <h2>Look and movement</h2>
+        </div>
+      </div>
       <div class="grid two">
         <label class="field">
           <span>Theme</span>
@@ -76,50 +110,31 @@
           </select>
         </label>
       </div>
-    </section>
-
-    <section class="card section">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">Vibe controls</p>
-          <h2>How your buddy behaves</h2>
-        </div>
-      </div>
-      <label class="toggle">
-        <div>
-          <strong>Show buddy on pages</strong>
-          <span>The little raccoon stays visible while you browse.</span>
-        </div>
-        <input id="enabled" name="enabled" type="checkbox" />
-      </label>
-      <label class="toggle">
-        <div>
-          <strong>Speech bubbles</strong>
-          <span>Friendly comments and goofy reactions.</span>
-        </div>
-        <input id="speech" name="speech" type="checkbox" />
-      </label>
       <label class="toggle">
         <div>
           <strong>Motivator mode</strong>
-          <span>Encouraging lines when momentum slows down.</span>
+          <span>Friendly nudges when things go quiet.</span>
         </div>
         <input id="motivation" name="motivation" type="checkbox" />
       </label>
       <label class="toggle">
         <div>
           <strong>Auto hop on double poke</strong>
-          <span>Let the buddy jump to another side when teased.</span>
+          <span>Still let the buddy bounce corners when teased.</span>
         </div>
         <input id="autoHop" name="autoHop" type="checkbox" />
       </label>
+      <div class="actions">
+        <button id="resetPosition" class="ghost-button" type="button">Reset to corner</button>
+        <span class="micro-copy">Drag anywhere on page to place manually.</span>
+      </div>
     </section>
 
-    <section class="card section">
+    <section class="panel card" data-panel="analytics">
       <div class="section-head">
         <div>
-          <p class="section-kicker">Stats</p>
-          <h2>Browser company numbers</h2>
+          <p class="section-kicker">Analytics</p>
+          <h2>Company numbers</h2>
         </div>
         <button id="resetStats" class="ghost-button" type="button">Reset</button>
       </div>
