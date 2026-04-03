@@ -429,24 +429,156 @@ h2 {
   height: 34px;
 }
 
-.pet-dot,
+.mood-glyph,
 .theme-swatch,
-.anchor-preview {
+.anchor-preview,
+.mini-pet {
   width: 32px;
   height: 32px;
-  border-radius: 12px;
+  position: relative;
 }
 
-.pet-dot.raccoon {
+.mood-glyph {
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff4df, #f5e4cf);
+  overflow: hidden;
+}
+
+.mood-glyph span {
+  position: absolute;
+  border-radius: 999px;
+}
+
+.mood-glyph.hype span {
+  width: 6px;
+  bottom: 5px;
+  background: linear-gradient(180deg, #ffd892, #eeab52);
+  animation: hype-bars 0.9s ease-in-out infinite;
+}
+
+.mood-glyph.hype span:nth-child(1) { left: 7px; height: 10px; animation-delay: 0s; }
+.mood-glyph.hype span:nth-child(2) { left: 13px; height: 16px; animation-delay: 0.12s; }
+.mood-glyph.hype span:nth-child(3) { left: 19px; height: 12px; animation-delay: 0.24s; }
+
+.mood-glyph.chill span {
+  left: 7px;
+  top: 9px;
+  width: 18px;
+  height: 12px;
+  border-radius: 999px;
+  border-bottom: 3px solid #9bc3d5;
+  animation: chill-wave 1.8s ease-in-out infinite;
+}
+
+.mood-glyph.chaos span {
+  background: linear-gradient(180deg, #ffca7c, #de7f45);
+  clip-path: polygon(50% 0, 64% 34%, 100% 36%, 72% 57%, 82% 100%, 50% 74%, 18% 100%, 28% 57%, 0 36%, 36% 34%);
+}
+
+.mood-glyph.chaos span:nth-child(1) {
+  width: 12px;
+  height: 12px;
+  left: 6px;
+  top: 6px;
+  animation: chaos-pop 1s ease-in-out infinite;
+}
+
+.mood-glyph.chaos span:nth-child(2) {
+  width: 14px;
+  height: 14px;
+  right: 5px;
+  bottom: 5px;
+  animation: chaos-pop 1s ease-in-out infinite 0.24s;
+}
+
+.mini-pet {
+  width: 38px;
+  height: 38px;
+  margin-top: 2px;
+}
+
+.mini-body,
+.mini-head,
+.mini-tail,
+.mini-ear,
+.mini-mask {
+  position: absolute;
+}
+
+.mini-body {
+  left: 10px;
+  bottom: 4px;
+  width: 20px;
+  height: 14px;
+  border-radius: 10px;
+}
+
+.mini-head {
+  left: 12px;
+  top: 7px;
+  width: 16px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+.mini-tail {
+  right: 4px;
+  bottom: 8px;
+  width: 12px;
+  height: 18px;
+  border-radius: 999px;
+  transform: rotate(20deg);
+}
+
+.mini-ear {
+  top: 3px;
+  width: 7px;
+  height: 7px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.mini-ear.left { left: 11px; }
+.mini-ear.right { right: 10px; }
+
+.mini-mask {
+  left: 13px;
+  top: 11px;
+  width: 14px;
+  height: 6px;
+  border-radius: 999px;
+}
+
+.mini-pet.raccoon .mini-body,
+.mini-pet.raccoon .mini-head,
+.mini-pet.raccoon .mini-ear,
+.mini-pet.raccoon .mini-tail {
   background: linear-gradient(180deg, #e5b384, #be7f54);
 }
 
-.pet-dot.fox {
+.mini-pet.raccoon .mini-mask {
+  background: rgba(80, 49, 30, 0.72);
+}
+
+.mini-pet.fox .mini-body,
+.mini-pet.fox .mini-head,
+.mini-pet.fox .mini-ear,
+.mini-pet.fox .mini-tail {
   background: linear-gradient(180deg, #f0a86f, #d5754d);
 }
 
-.pet-dot.cat {
+.mini-pet.fox .mini-mask {
+  background: rgba(120, 58, 26, 0.38);
+}
+
+.mini-pet.cat .mini-body,
+.mini-pet.cat .mini-head,
+.mini-pet.cat .mini-ear,
+.mini-pet.cat .mini-tail {
   background: linear-gradient(180deg, #d8c4b4, #b49a87);
+}
+
+.mini-pet.cat .mini-mask {
+  background: rgba(93, 74, 60, 0.28);
 }
 
 .theme-swatch.workshop {
@@ -463,36 +595,39 @@ h2 {
 
 .anchor-preview {
   position: relative;
+  width: 40px;
+  height: 36px;
   background: linear-gradient(180deg, #f2e6d8, #e7d7c6);
+  border: 1px solid rgba(131, 101, 80, 0.1);
 }
 
-.anchor-preview::after {
-  content: "";
+.anchor-buddy {
   position: absolute;
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
   background: linear-gradient(180deg, #ffdb97, #efae57);
+  box-shadow: 0 0 0 2px rgba(255, 245, 228, 0.8);
 }
 
-.anchor-preview.bottom-left::after {
-  left: 5px;
-  bottom: 5px;
+.anchor-preview.bottom-left .anchor-buddy {
+  left: 6px;
+  bottom: 6px;
 }
 
-.anchor-preview.mid-left::after {
-  left: 5px;
-  top: 11px;
+.anchor-preview.mid-left .anchor-buddy {
+  left: 6px;
+  top: 13px;
 }
 
-.anchor-preview.mid-right::after {
-  right: 5px;
-  top: 11px;
+.anchor-preview.mid-right .anchor-buddy {
+  right: 6px;
+  top: 13px;
 }
 
-.anchor-preview.bottom-right::after {
-  right: 5px;
-  bottom: 5px;
+.anchor-preview.bottom-right .anchor-buddy {
+  right: 6px;
+  bottom: 6px;
 }
 
 .field span,
@@ -622,4 +757,19 @@ select:focus {
 @keyframes preview-right-leg {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(-9deg); }
+}
+
+@keyframes hype-bars {
+  0%, 100% { transform: scaleY(0.88); }
+  50% { transform: scaleY(1.18); }
+}
+
+@keyframes chill-wave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
+}
+
+@keyframes chaos-pop {
+  0%, 100% { transform: scale(0.9) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(8deg); }
 }
