@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goblin Workshop Preview</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --ink: #20160f;
+      --muted: #6b5a4d;
+      --panel: #2a1d15;
+      --panel-2: #3b281d;
+      --accent: #f3b13f;
+      --accent-2: #82c46c;
+      --danger: #de725f;
+      --shadow: 0 18px 45px rgba(23, 11, 4, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 228, 186, 0.9), transparent 26%),
+        linear-gradient(135deg, #efe3d1, #e5d6c4 48%, #d6c8bb);
+      overflow: hidden;
+    }
+
+    .page {
+      padding: 36px;
+    }
+
+    .browser {
+      max-width: 1200px;
+      margin: 0 auto;
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(80, 59, 44, 0.1);
+      box-shadow: 0 18px 80px rgba(54, 35, 18, 0.14);
+      backdrop-filter: blur(14px);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(66, 40, 18, 0.08);
+      background: rgba(255, 248, 239, 0.8);
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: #d7b494;
+    }
+
+    .address {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(112, 83, 60, 0.08);
+      color: #5f4a3b;
+      font-size: 14px;
+    }
+
+    .site {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      min-height: 720px;
+    }
+
+    .content {
+      padding: 42px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 54px;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 0 0 30px;
+      color: #6e5b4d;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      min-height: 160px;
+      padding: 20px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(91, 65, 43, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .sidebar {
+      padding: 42px 32px;
+      border-left: 1px solid rgba(66, 40, 18, 0.08);
+      background: rgba(255, 251, 245, 0.72);
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(243, 177, 63, 0.2);
+      color: #784d00;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .list {
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .list-item {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .widget {
+      position: fixed;
+      left: 32px;
+      bottom: 28px;
+      width: 372px;
+      color: #f8ebd9;
+      background:
+        radial-gradient(circle at top right, rgba(243, 177, 63, 0.12), transparent 24%),
+        linear-gradient(180deg, #3b281d, #251810);
+      border: 1px solid rgba(255, 226, 186, 0.08);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .widget.minimized .body,
+    .widget.minimized .footer {
+      display: none;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px 14px;
+      cursor: move;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #6eaf53, #3b6d2c);
+      font-size: 24px;
+      box-shadow: inset 0 -4px 0 rgba(0,0,0,0.18);
+    }
+
+    .title {
+      display: grid;
+      gap: 3px;
+    }
+
+    .title strong {
+      font-size: 16px;
+      letter-spacing: 0.01em;
+    }
+
+    .title span {
+      color: #d2bca7;
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 10px;
+      color: #f8ebd9;
+      background: rgba(255,255,255,0.08);
+      cursor: pointer;
+    }
+
+    .body {
+      padding: 0 18px 18px;
+    }
+
+    .scene {
+      position: relative;
+      height: 164px;
+      margin-bottom: 14px;
+      border-radius: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(247, 184, 73, 0.32), transparent 40%),
+        linear-gradient(180deg, #573622 0%, #3d2618 42%, #29190f 100%);
+    }
+
+    .floor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 44px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), transparent),
+        repeating-linear-gradient(90deg, #5d402b 0 18px, #4a3324 18px 36px);
+    }
+
+    .goblin {
+      position: absolute;
+      left: 34px;
+      bottom: 30px;
+      width: 80px;
+      height: 92px;
+    }
+
+    .goblin .head {
+      position: absolute;
+      left: 18px;
+      top: 0;
+      width: 44px;
+      height: 38px;
+      border-radius: 18px 18px 14px 14px;
+      background: #7abf5d;
+    }
+
+    .goblin .ear {
+      position: absolute;
+      top: 10px;
+      width: 16px;
+      height: 14px;
+      background: #7abf5d;
+    }
+
+    .goblin .ear.left {
+      left: 6px;
+      clip-path: polygon(100% 0, 0 50%, 100% 100%);
+    }
+
+    .goblin .ear.right {
+      right: 0;
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+
+    .goblin .body-shape {
+      position: absolute;
+      left: 14px;
+      top: 30px;
+      width: 50px;
+      height: 44px;
+      border-radius: 14px 14px 10px 10px;
+      background: #a25b2b;
+    }
+
+    .goblin .arm {
+      position: absolute;
+      top: 42px;
+      width: 14px;
+      height: 28px;
+      border-radius: 10px;
+      background: #7abf5d;
+    }
+
+    .goblin .arm.left {
+      left: 6px;
+      transform: rotate(26deg);
+    }
+
+    .goblin .arm.right {
+      right: 2px;
+      transform: rotate(-36deg);
+    }
+
+    .goblin .hammer {
+      position: absolute;
+      right: -2px;
+      top: 46px;
+      width: 34px;
+      height: 8px;
+      border-radius: 999px;
+      background: #9e7d60;
+      transform: rotate(-28deg);
+    }
+
+    .goblin .hammer::after {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: -6px;
+      width: 16px;
+      height: 18px;
+      border-radius: 5px;
+      background: #c6c1ba;
+    }
+
+    .anvil {
+      position: absolute;
+      left: 120px;
+      bottom: 38px;
+      width: 60px;
+      height: 34px;
+      border-radius: 10px 10px 14px 14px;
+      background: linear-gradient(180deg, #aab0b6, #5f6870);
+    }
+
+    .furnace {
+      position: absolute;
+      right: 28px;
+      bottom: 36px;
+      width: 88px;
+      height: 94px;
+      border-radius: 18px 18px 12px 12px;
+      background: linear-gradient(180deg, #6c4530, #41271a);
+      border: 2px solid rgba(255,255,255,0.06);
+    }
+
+    .furnace::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 28px;
+      width: 50px;
+      height: 38px;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 50% 50%, #ffd27b, #ff9934 42%, #8e3313 70%);
+      box-shadow: 0 0 24px rgba(255, 164, 59, 0.4);
+    }
+
+    .spark {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #ffd979;
+      box-shadow: 0 0 10px rgba(255, 217, 121, 0.7);
+      animation: float 2.2s ease-in-out infinite;
+    }
+
+    .spark.one {
+      left: 180px;
+      top: 56px;
+    }
+
+    .spark.two {
+      left: 194px;
+      top: 72px;
+      animation-delay: 0.6s;
+    }
+
+    .spark.three {
+      left: 206px;
+      top: 48px;
+      animation-delay: 1.2s;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .stat label {
+      display: block;
+      margin-bottom: 5px;
+      color: #cbb39d;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat strong {
+      font-size: 18px;
+    }
+
+    .queue {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .queue-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #d8c1ae;
+    }
+
+    .bar {
+      height: 10px;
+      margin-bottom: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .fill {
+      width: 68%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #ffd977);
+    }
+
+    .queue small {
+      color: #b99f89;
+    }
+
+    .footer {
+      display: flex;
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+
+    .action {
+      flex: 1;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .action.primary {
+      background: var(--accent);
+      color: #3d2206;
+    }
+
+    .action.secondary {
+      background: rgba(255,255,255,0.08);
+      color: #f8ebd9;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); opacity: 0.65; }
+      50% { transform: translateY(-10px); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="browser">
+      <div class="toolbar">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="address">https://example.com/article/how-systems-scale</div>
+      </div>
+      <div class="site">
+        <main class="content">
+          <h1>Injected browser game concept, but actually cute.</h1>
+          <p class="lead">
+            This page is only here to simulate normal browsing. The real idea is the floating widget:
+            a mischievous goblin workshop that keeps crafting while the user scrolls the web.
+          </p>
+          <div class="cards">
+            <section class="card">
+              <h2>Always visible</h2>
+              <p>
+                Small enough not to annoy, alive enough to tempt a quick peek every few minutes.
+              </p>
+            </section>
+            <section class="card">
+              <h2>Zero setup</h2>
+              <p>
+                Open browser, goblin starts hammering. Come back for coins, loot, upgrades, and chaos.
+              </p>
+            </section>
+            <section class="card">
+              <h2>Fast loop</h2>
+              <p>
+                Collect scraps, craft odd trinkets, unlock better benches, hire goblin interns.
+              </p>
+            </section>
+            <section class="card">
+              <h2>Funny tone</h2>
+              <p>
+                The workshop should feel like a tiny illegal economy living on top of the internet.
+              </p>
+            </section>
+          </div>
+        </main>
+        <aside class="sidebar">
+          <div class="tag">Concept preview only</div>
+          <div class="list">
+            <div class="list-item">Theme: warm wood, furnace glow, scrappy fantasy workshop.</div>
+            <div class="list-item">Mood: playful, cozy, slightly chaotic, low-stakes dopamine.</div>
+            <div class="list-item">Interaction: drag, minimize, collect, upgrade, boost.</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget" id="widget">
+    <div class="header" id="dragHandle">
+      <div class="header-left">
+        <div class="avatar">g</div>
+        <div class="title">
+          <strong>Goblin Workshop</strong>
+          <span>1 goblin active  .  3 trinkets in queue</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="icon-btn" id="minBtn" aria-label="Minimize">-</button>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="scene">
+        <div class="spark one"></div>
+        <div class="spark two"></div>
+        <div class="spark three"></div>
+        <div class="goblin">
+          <div class="ear left"></div>
+          <div class="ear right"></div>
+          <div class="head"></div>
+          <div class="body-shape"></div>
+          <div class="arm left"></div>
+          <div class="arm right"></div>
+          <div class="hammer"></div>
+        </div>
+        <div class="anvil"></div>
+        <div class="furnace"></div>
+        <div class="floor"></div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <label>Scrap</label>
+          <strong>128</strong>
+        </div>
+        <div class="stat">
+          <label>Coins</label>
+          <strong>47</strong>
+        </div>
+        <div class="stat">
+          <label>Heat</label>
+          <strong style="color: #ffd47f;">83%</strong>
+        </div>
+      </div>
+
+      <div class="queue">
+        <div class="queue-title">
+          <span>Current craft: Bent Crown</span>
+          <span>18s</span>
+        </div>
+        <div class="bar">
+          <div class="fill"></div>
+        </div>
+        <small>Next up: Rust Ring, Pocket Idol, Weird Spoon</small>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button class="action primary">Collect 12 coins</button>
+      <button class="action secondary">Upgrade bench</button>
+    </div>
+  </div>
+
+  <script>
+    const widget = document.getElementById("widget");
+    const dragHandle = document.getElementById("dragHandle");
+    const minBtn = document.getElementById("minBtn");
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    dragHandle.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) return;
+      dragging = true;
+      const rect = widget.getBoundingClientRect();
+      offsetX = event.clientX - rect.left;
+      offsetY = event.clientY - rect.top;
+      widget.setPointerCapture(event.pointerId);
+    });
+
+    widget.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      widget.style.left = Math.max(12, event.clientX - offsetX) + "px";
+      widget.style.top = Math.max(12, event.clientY - offsetY) + "px";
+      widget.style.bottom = "auto";
+    });
+
+    widget.addEventListener("pointerup", () => {
+      dragging = false;
+    });
+
+    minBtn.addEventListener("click", () => {
+      widget.classList.toggle("minimized");
+    });
+  </script>
+</body>
+</html>
