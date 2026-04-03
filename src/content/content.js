@@ -14,7 +14,8 @@ const DEFAULT_SETTINGS = {
   speech: true,
   motivation: true,
   autoHop: true,
-  roaming: true
+  roaming: true,
+  gravityDrop: false
 };
 const DEFAULT_STATS = {
   shinyBits: 0,
@@ -200,6 +201,7 @@ function createStyles() {
     .buddy[data-state="idle"] .raccoon { animation: breathe 2.8s ease-in-out infinite; }
     .buddy[data-kicked="true"] { transform: rotate(-8deg) scale(calc(var(--buddy-scale) * 0.97)); }
     .buddy[data-dragging="true"] { transition: none; transform: scale(calc(var(--buddy-scale) * 1.03)); filter: drop-shadow(0 24px 36px rgba(35, 18, 8, 0.28)); }
+    .buddy[data-falling="true"] { transition: top 520ms cubic-bezier(0.2, 0.78, 0.18, 1.06), left 220ms ease, transform 160ms ease; }
     .scene { position: relative; width: 100%; height: 100%; cursor: grab; }
     .scene:active { cursor: grabbing; }
     .badge {
@@ -401,6 +403,10 @@ function mountBuddy() {
     buddy.style.top = `${nextPosition.y}px`;
   }
 
+  function getFloorY() {
+    return clamp(window.innerHeight - buddy.offsetHeight - 8, 8, window.innerHeight - buddy.offsetHeight - 8);
+  }
+
   function showMessage(text, duration = 1500) {
     if (!settings.speech && duration !== 0) return;
     window.clearTimeout(bubbleTimer);
@@ -422,7 +428,7 @@ function mountBuddy() {
     const nextPosition = settings.positionMode === "custom" && settings.customPosition
       ? {
           x: clamp(settings.customPosition.x, 8, window.innerWidth - buddy.offsetWidth - 8),
-          y: clamp(settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
+          y: clamp(settings.gravityDrop ? getFloorY() : settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
         }
       : resolveAnchorPosition(currentAnchorIndex);
 
@@ -563,7 +569,7 @@ function mountBuddy() {
     }
 
     const maxOffsetX = settings.positionMode === "custom" ? 34 : 22;
-    const maxOffsetY = 16;
+    const maxOffsetY = settings.gravityDrop ? 0 : 16;
     const target = {
       x: clamp(homePosition.x + Math.round((Math.random() * 2 - 1) * maxOffsetX), 8, window.innerWidth - buddy.offsetWidth - 8),
       y: clamp(homePosition.y + Math.round((Math.random() * 2 - 1) * maxOffsetY), 8, window.innerHeight - buddy.offsetHeight - 8)
@@ -577,7 +583,7 @@ function mountBuddy() {
     window.setTimeout(() => {
       buddy.dataset.roam = "idle";
       if (settings.positionMode === "custom") {
-        setBuddyPosition(homePosition);
+        setBuddyPosition(settings.gravityDrop ? { x: homePosition.x, y: getFloorY() } : homePosition);
         buddy.style.transform = "scale(var(--buddy-scale))";
       }
     }, 900);
@@ -616,12 +622,29 @@ function mountBuddy() {
     stats = bumpStat(stats, "drags");
     const currentLeft = parseFloat(buddy.style.left || "0");
     const currentTop = parseFloat(buddy.style.top || "0");
-    settings.positionMode = "custom";
-    settings.customPosition = { x: currentLeft, y: currentTop };
-    homePosition = { x: currentLeft, y: currentTop };
-    saveSettings();
-    buddy.dataset.mood = "proud";
-    showMessage("Nice. I live here now.", 1100);
+    if (settings.gravityDrop) {
+      const floorY = getFloorY();
+      settings.positionMode = "custom";
+      settings.customPosition = { x: currentLeft, y: floorY };
+      homePosition = { x: currentLeft, y: floorY };
+      saveSettings();
+      buddy.dataset.falling = "true";
+      buddy.dataset.roam = "walking";
+      setBuddyPosition({ x: currentLeft, y: floorY });
+      window.setTimeout(() => {
+        buddy.dataset.falling = "false";
+        buddy.dataset.roam = "idle";
+        buddy.dataset.mood = "proud";
+      }, 560);
+      showMessage("Wheee... floor acquired.", 1200);
+    } else {
+      settings.positionMode = "custom";
+      settings.customPosition = { x: currentLeft, y: currentTop };
+      homePosition = { x: currentLeft, y: currentTop };
+      saveSettings();
+      buddy.dataset.mood = "proud";
+      showMessage("Nice. I live here now.", 1100);
+    }
   }
 
   function setupStorageSync() {
@@ -718,7 +741,7 @@ function mountBuddy() {
     const nextPosition = settings.positionMode === "custom" && settings.customPosition
       ? {
           x: clamp(settings.customPosition.x, 8, window.innerWidth - buddy.offsetWidth - 8),
-          y: clamp(settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
+          y: clamp(settings.gravityDrop ? getFloorY() : settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
         }
       : resolveAnchorPosition(currentAnchorIndex);
     setBuddyPosition(nextPosition);

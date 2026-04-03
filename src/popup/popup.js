@@ -11,7 +11,8 @@ const DEFAULT_SETTINGS = {
   speech: true,
   motivation: true,
   autoHop: true,
-  roaming: true
+  roaming: true,
+  gravityDrop: false
 };
 
 const DEFAULT_STATS = {
@@ -33,7 +34,8 @@ const settingsFields = [
   "speech",
   "motivation",
   "autoHop",
-  "roaming"
+  "roaming",
+  "gravityDrop"
 ];
 
 function merge(defaults, value) {
@@ -118,7 +120,8 @@ function collectSettingsFromForm() {
     speech: $("speech").checked,
     motivation: $("motivation").checked,
     autoHop: $("autoHop").checked,
-    roaming: $("roaming").checked
+    roaming: $("roaming").checked,
+    gravityDrop: $("gravityDrop").checked
   };
 }
 

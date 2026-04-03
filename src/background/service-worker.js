@@ -11,7 +11,8 @@ const DEFAULT_SETTINGS = {
   speech: true,
   motivation: true,
   autoHop: true,
-  roaming: true
+  roaming: true,
+  gravityDrop: false
 };
 
 const DEFAULT_STATS = {
