@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Browser Buddy",
-  "version": "0.1.0",
-  "description": "A draggable browser pet that lives on top of webpages and reacts to browsing activity.",
+  "version": "0.2.0",
+  "description": "A playful browser companion that hangs out on webpages, reacts to your momentum, and keeps work a little less lonely.",
   "action": {
     "default_title": "Browser Buddy",
     "default_popup": "src/popup/popup.html"
@@ -27,11 +27,5 @@
       ],
       "run_at": "document_idle"
     }
-  ],
-  "icons": {
-    "16": "public/icons/icon-16.png",
-    "32": "public/icons/icon-32.png",
-    "48": "public/icons/icon-48.png",
-    "128": "public/icons/icon-128.png"
-  }
+  ]
 }

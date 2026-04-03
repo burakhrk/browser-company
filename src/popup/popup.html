@@ -8,22 +8,144 @@
 </head>
 <body>
   <main class="popup">
-    <section class="hero">
+    <section class="hero card">
       <p class="eyebrow">Browser Buddy</p>
-      <h1>Stats and customization will live here.</h1>
-      <p class="copy">
-        The always-on pet stays on the page. This popup is reserved for deeper controls and progress.
-      </p>
+      <h1>Your tiny browser company is online.</h1>
+      <p class="copy">Friendly little work buddy, zero guilt, just vibes and momentum.</p>
+      <div class="hero-stats">
+        <div>
+          <span class="stat-label">Buddy</span>
+          <strong id="heroName">Momo</strong>
+        </div>
+        <div>
+          <span class="stat-label">Shiny bits</span>
+          <strong id="heroBits">0</strong>
+        </div>
+        <div>
+          <span class="stat-label">Mood</span>
+          <strong id="heroMood">Hype</strong>
+        </div>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>Current plan</h2>
-      <ul>
-        <li>Draggable on-page companion</li>
-        <li>Light browser activity reactions</li>
-        <li>Customization and themes</li>
-      </ul>
+    <section class="card section">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Profile</p>
+          <h2>Make it yours</h2>
+        </div>
+      </div>
+      <label class="field">
+        <span>Name</span>
+        <input id="petName" name="petName" type="text" maxlength="20" placeholder="Momo" />
+      </label>
+      <div class="grid two">
+        <label class="field">
+          <span>Personality</span>
+          <select id="personality" name="personality">
+            <option value="hype">Hype</option>
+            <option value="chill">Chill</option>
+            <option value="chaos">Chaos gremlin</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Size</span>
+          <select id="size" name="size">
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </label>
+      </div>
+      <div class="grid two">
+        <label class="field">
+          <span>Theme</span>
+          <select id="theme" name="theme">
+            <option value="workshop">Workshop</option>
+            <option value="sunset">Sunset</option>
+            <option value="mint">Mint</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Default corner</span>
+          <select id="anchor" name="anchor">
+            <option value="bottom-right">Bottom right</option>
+            <option value="bottom-left">Bottom left</option>
+            <option value="mid-right">Mid right</option>
+            <option value="mid-left">Mid left</option>
+          </select>
+        </label>
+      </div>
     </section>
+
+    <section class="card section">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Vibe controls</p>
+          <h2>How your buddy behaves</h2>
+        </div>
+      </div>
+      <label class="toggle">
+        <div>
+          <strong>Show buddy on pages</strong>
+          <span>The little raccoon stays visible while you browse.</span>
+        </div>
+        <input id="enabled" name="enabled" type="checkbox" />
+      </label>
+      <label class="toggle">
+        <div>
+          <strong>Speech bubbles</strong>
+          <span>Friendly comments and goofy reactions.</span>
+        </div>
+        <input id="speech" name="speech" type="checkbox" />
+      </label>
+      <label class="toggle">
+        <div>
+          <strong>Motivator mode</strong>
+          <span>Encouraging lines when momentum slows down.</span>
+        </div>
+        <input id="motivation" name="motivation" type="checkbox" />
+      </label>
+      <label class="toggle">
+        <div>
+          <strong>Auto hop on double poke</strong>
+          <span>Let the buddy jump to another side when teased.</span>
+        </div>
+        <input id="autoHop" name="autoHop" type="checkbox" />
+      </label>
+    </section>
+
+    <section class="card section">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Stats</p>
+          <h2>Browser company numbers</h2>
+        </div>
+        <button id="resetStats" class="ghost-button" type="button">Reset</button>
+      </div>
+      <div class="stats-grid">
+        <div class="mini-stat">
+          <span>Pokes</span>
+          <strong id="pokesValue">0</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Kicks</span>
+          <strong id="kicksValue">0</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Drags</span>
+          <strong id="dragsValue">0</strong>
+        </div>
+        <div class="mini-stat">
+          <span>Rewards</span>
+          <strong id="rewardsValue">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <p id="saveNote" class="save-note">Saved. Tiny operations are stable.</p>
   </main>
+
+  <script src="popup.js"></script>
 </body>
 </html>
