@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS = {
   petName: "Momo",
   size: "medium",
   theme: "workshop",
-  petVariant: "raccoon",
+  petVariant: "classic",
   anchor: "bottom-right",
   positionMode: "anchor",
   customPosition: null,
@@ -60,32 +60,32 @@ const themeMap = {
 };
 
 const variantMap = {
-  raccoon: {
-    furTop: "#e5b384",
-    furBottom: "#be7f54",
-    bodyTop: "#c88a57",
-    bodyBottom: "#9d6139",
-    mask: "rgba(80, 49, 30, 0.72)",
-    earTop: "#d89d6d",
-    earBottom: "#a86842"
+  classic: {
+    furTop: "#ffffff",
+    furBottom: "#171717",
+    bodyTop: "#f6f0e8",
+    bodyBottom: "#171717",
+    mask: "rgba(29, 29, 29, 0.85)",
+    earTop: "#ffb655",
+    earBottom: "#ff8b50"
   },
-  fox: {
-    furTop: "#f0a86f",
-    furBottom: "#d5754d",
-    bodyTop: "#da8850",
-    bodyBottom: "#b35d36",
-    mask: "rgba(120, 58, 26, 0.38)",
-    earTop: "#f0b07e",
-    earBottom: "#c76b3d"
+  spark: {
+    furTop: "#fff7dd",
+    furBottom: "#144c5a",
+    bodyTop: "#f0fffd",
+    bodyBottom: "#0b667b",
+    mask: "rgba(14, 83, 99, 0.88)",
+    earTop: "#67d9cb",
+    earBottom: "#26a7b7"
   },
-  cat: {
-    furTop: "#d8c4b4",
-    furBottom: "#b49a87",
-    bodyTop: "#c9b09b",
-    bodyBottom: "#9f8470",
-    mask: "rgba(93, 74, 60, 0.28)",
-    earTop: "#dbc7b7",
-    earBottom: "#ac917d"
+  shadow: {
+    furTop: "#f4eefc",
+    furBottom: "#32223f",
+    bodyTop: "#f4eefc",
+    bodyBottom: "#4b3864",
+    mask: "rgba(54, 36, 73, 0.9)",
+    earTop: "#b388ff",
+    earBottom: "#6f58a8"
   }
 };
 
@@ -262,43 +262,65 @@ function createStyles() {
     .workshop,
     .crate,
     .progress { display: none !important; }
-    .raccoon { position: absolute; left: 16px; bottom: 18px; width: 78px; height: 82px; transition: transform 180ms ease; transform-origin: center bottom; }
+    .raccoon { position: absolute; left: 26px; bottom: 16px; width: 48px; height: 88px; transition: transform 180ms ease; transform-origin: center bottom; }
     .buddy[data-state="active"] .raccoon { animation: work 0.9s ease-in-out infinite; }
     .buddy[data-state="reward"] .raccoon { transform: translateY(-4px); }
     .buddy[data-roam="walking"] .raccoon { animation: walk-cycle 0.64s ease-in-out infinite; }
     .buddy[data-mood="sleepy"] .raccoon { animation: sleepy 3.6s ease-in-out infinite; }
     .buddy[data-mood="annoyed"] .raccoon { animation: shake 0.28s ease-in-out 2; }
     .buddy[data-mood="proud"] .raccoon { animation: proud 1.2s ease-in-out infinite; }
-    .tail { position: absolute; right: -7px; bottom: 8px; width: 28px; height: 46px; border-radius: 18px; background: linear-gradient(180deg, #c18b5e, #8d5b37); transform: rotate(24deg); transform-origin: center bottom; animation: tail 3s ease-in-out infinite; }
-    .tail::after { content: ""; position: absolute; inset: 7px 5px 6px 5px; border-radius: 14px; background: repeating-linear-gradient(180deg, rgba(91, 50, 26, 0.85) 0 6px, rgba(242, 216, 185, 0.75) 6px 12px); }
-    .body { position: absolute; left: 12px; bottom: 0; width: 52px; height: 46px; border-radius: 22px 22px 18px 18px; background: linear-gradient(180deg, var(--body-top), var(--body-bottom)); box-shadow: inset 0 3px 0 rgba(255, 231, 199, 0.18); }
-    .apron { position: absolute; left: 18px; bottom: 7px; width: 40px; height: 32px; border-radius: 16px; background: linear-gradient(180deg, var(--theme-apron-top), var(--theme-apron-bottom)); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2); }
-    .head { position: absolute; left: 16px; top: 6px; width: 46px; height: 42px; border-radius: 22px; background: linear-gradient(180deg, var(--fur-top), var(--fur-bottom)); box-shadow: inset 0 3px 0 rgba(255, 235, 210, 0.24); transform-origin: center bottom; }
+    .tail,
+    .apron,
+    .mask,
+    .snout,
+    .blush,
+    .head::before,
+    .head::after { display: none !important; }
+    .body {
+      position: absolute;
+      left: 22px;
+      bottom: 18px;
+      width: 6px;
+      height: 34px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--body-top), var(--body-bottom));
+      box-shadow: 12px 4px 0 -4px var(--theme-accent);
+    }
+    .head {
+      position: absolute;
+      left: 11px;
+      top: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--fur-top), #ffffff);
+      border: 4px solid var(--fur-bottom);
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.65);
+      transform-origin: center bottom;
+    }
     .buddy[data-state="active"] .head { animation: nod 0.9s ease-in-out infinite; }
     .buddy[data-roam="walking"] .head { animation: head-bob 0.64s ease-in-out infinite; }
     .head::before, .head::after { content: ""; position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 4px 16px 5px 16px; background: linear-gradient(180deg, var(--ear-top), var(--ear-bottom)); }
     .head::before { left: 4px; transform: rotate(-24deg); }
     .head::after { right: 4px; transform: scaleX(-1) rotate(-24deg); }
     .mask { position: absolute; left: 9px; top: 10px; width: 28px; height: 14px; border-radius: 999px; background: var(--mask-color); }
-    .eye { position: absolute; top: 14px; width: 7px; height: 10px; border-radius: 999px; background: #1d1008; transform-origin: center center; transition: transform 140ms ease; }
-    .eye.left { left: 16px; }
-    .eye.right { right: 15px; }
+    .eye { position: absolute; top: 10px; width: 4px; height: 4px; border-radius: 999px; background: #1d1008; transform-origin: center center; transition: transform 140ms ease; }
+    .eye.left { left: 6px; }
+    .eye.right { right: 6px; }
     .buddy[data-state="idle"] .eye { animation: blink 4s ease-in-out infinite; }
     .buddy[data-mood="focused"] .eye { transform: scaleY(0.85) translateY(1px); }
     .buddy[data-mood="sleepy"] .eye { transform: scaleY(0.25) translateY(2px); }
     .buddy[data-mood="annoyed"] .eye { transform: scaleY(0.8); }
-    .brow { position: absolute; top: 10px; width: 12px; height: 3px; border-radius: 999px; background: rgba(63, 36, 17, 0.78); transition: transform 160ms ease; }
-    .brow.left { left: 13px; transform: rotate(-8deg); }
-    .brow.right { right: 12px; transform: rotate(8deg); }
+    .brow { position: absolute; top: 6px; width: 10px; height: 2px; border-radius: 999px; background: rgba(63, 36, 17, 0.78); transition: transform 160ms ease; }
+    .brow.left { left: 4px; transform: rotate(-8deg); }
+    .brow.right { right: 4px; transform: rotate(8deg); }
     .buddy[data-mood="focused"] .brow.left { transform: translateY(1px) rotate(10deg); }
     .buddy[data-mood="focused"] .brow.right { transform: translateY(1px) rotate(-10deg); }
     .buddy[data-mood="annoyed"] .brow.left { transform: translateY(-1px) rotate(18deg); }
     .buddy[data-mood="annoyed"] .brow.right { transform: translateY(-1px) rotate(-18deg); }
     .buddy[data-mood="sleepy"] .brow.left,
     .buddy[data-mood="sleepy"] .brow.right { transform: translateY(2px) rotate(0deg); }
-    .snout { position: absolute; left: 14px; bottom: 7px; width: 20px; height: 13px; border-radius: 999px; background: #f7e2cb; }
-    .snout::after { content: ""; position: absolute; left: 8px; top: 2px; width: 4px; height: 4px; border-radius: 999px; background: #543120; }
-    .mouth { position: absolute; left: 18px; bottom: 4px; width: 10px; height: 6px; border-radius: 0 0 10px 10px; border-bottom: 2px solid #6e4632; }
+    .mouth { position: absolute; left: 9px; bottom: 5px; width: 10px; height: 5px; border-radius: 0 0 10px 10px; border-bottom: 2px solid #6e4632; }
     .buddy[data-mood="sleepy"] .mouth { width: 8px; height: 2px; border-bottom-width: 1px; }
     .buddy[data-mood="annoyed"] .mouth { border-bottom: 0; border-top: 2px solid #6e4632; border-radius: 10px 10px 0 0; bottom: 6px; }
     .buddy[data-mood="proud"] .mouth,
@@ -308,39 +330,55 @@ function createStyles() {
     .blush.right { right: 8px; }
     .buddy[data-mood="proud"] .blush,
     .buddy[data-state="reward"] .blush { opacity: 1; }
-    .goggles { position: absolute; left: 11px; top: 7px; width: 26px; height: 8px; border-radius: 999px; background: #494845; }
-    .goggles::before, .goggles::after { content: ""; position: absolute; top: -1px; width: 11px; height: 11px; border-radius: 999px; background: linear-gradient(180deg, rgba(175, 224, 255, 0.9), rgba(105, 154, 188, 0.9)); border: 2px solid #40403e; }
-    .goggles::before { left: -1px; }
-    .goggles::after { right: -1px; }
-    .arm { position: absolute; top: 42px; width: 12px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, #da9f73, #b9784a); transform-origin: top center; }
-    .arm.left { left: 14px; transform: rotate(18deg); }
-    .arm.right { right: 8px; transform: rotate(-22deg); }
+    .goggles {
+      position: absolute;
+      left: 2px;
+      top: 8px;
+      width: 16px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--mask-color);
+      box-shadow: 10px 0 0 var(--mask-color);
+    }
+    .goggles::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 1px;
+      width: 10px;
+      height: 2px;
+      background: var(--mask-color);
+    }
+    .goggles::after { display: none; }
+    .arm { position: absolute; top: 33px; width: 4px; height: 26px; border-radius: 999px; background: linear-gradient(180deg, var(--body-top), var(--body-bottom)); transform-origin: top center; }
+    .arm.left { left: 10px; transform: rotate(28deg); }
+    .arm.right { right: 10px; transform: rotate(-28deg); }
     .buddy[data-state="active"] .arm.left { animation: left-arm 0.72s ease-in-out infinite; }
     .buddy[data-state="active"] .arm.right { animation: right-arm 0.72s ease-in-out infinite; }
     .buddy[data-roam="walking"] .arm.left { animation: walk-arm-left 0.64s ease-in-out infinite; }
     .buddy[data-roam="walking"] .arm.right { animation: walk-arm-right 0.64s ease-in-out infinite; }
-    .leg { position: absolute; bottom: -4px; width: 10px; height: 18px; border-radius: 999px; background: linear-gradient(180deg, #9d6139, #734525); transform-origin: top center; }
-    .leg.left { left: 21px; }
-    .leg.right { left: 39px; }
+    .leg { position: absolute; bottom: 0; width: 4px; height: 28px; border-radius: 999px; background: linear-gradient(180deg, var(--body-top), var(--body-bottom)); transform-origin: top center; }
+    .leg.left { left: 19px; }
+    .leg.right { left: 27px; }
     .buddy[data-state="active"] .leg.left { animation: left-leg 0.8s ease-in-out infinite; }
     .buddy[data-state="active"] .leg.right { animation: right-leg 0.8s ease-in-out infinite; }
     .buddy[data-roam="walking"] .leg.left { animation: walk-leg-left 0.64s ease-in-out infinite; }
     .buddy[data-roam="walking"] .leg.right { animation: walk-leg-right 0.64s ease-in-out infinite; }
-    .tool { position: absolute; right: -4px; top: 53px; width: 26px; height: 7px; border-radius: 999px; background: #7c604d; transform: rotate(-24deg); }
-    .tool::after { content: ""; position: absolute; right: -3px; top: -6px; width: 14px; height: 16px; border-radius: 5px; background: linear-gradient(180deg, #f0f3f6, #96a1a8); }
+    .tool { position: absolute; right: -3px; top: 43px; width: 24px; height: 4px; border-radius: 999px; background: #2c2c2c; transform: rotate(-18deg); }
+    .tool::after { content: ""; position: absolute; right: -2px; top: -3px; width: 8px; height: 10px; border-radius: 3px; background: linear-gradient(180deg, #f0f3f6, #96a1a8); }
     .buddy[data-state="active"] .tool { animation: tool-work 0.72s ease-in-out infinite; }
     .buddy[data-roam="walking"] .tool { animation: tool-sway 0.64s ease-in-out infinite; }
     .crate { position: absolute; right: 16px; bottom: 28px; width: 30px; height: 26px; border-radius: 9px; background: linear-gradient(180deg, #9b6a43, #6e4327); box-shadow: inset 0 2px 0 rgba(255, 244, 222, 0.16); }
     .crate::before, .crate::after { content: ""; position: absolute; left: 5px; right: 5px; height: 3px; border-radius: 999px; background: rgba(74, 41, 23, 0.6); }
     .crate::before { top: 8px; }
     .crate::after { bottom: 7px; }
-    .coin { position: absolute; right: 12px; bottom: 58px; width: 20px; height: 20px; border-radius: 999px; background: radial-gradient(circle at 30% 30%, #fff1b0, #f3b03e 70%, #a66a13); border: 2px solid rgba(255, 236, 190, 0.35); opacity: 0; transform: scale(0.6); transition: opacity 180ms ease, transform 180ms ease; }
+    .coin { position: absolute; right: 12px; bottom: 44px; width: 20px; height: 20px; border-radius: 999px; background: radial-gradient(circle at 30% 30%, #fff1b0, #f3b03e 70%, #a66a13); border: 2px solid rgba(255, 236, 190, 0.35); opacity: 0; transform: scale(0.6); transition: opacity 180ms ease, transform 180ms ease; }
     .buddy[data-state="reward"] .coin { opacity: 1; transform: scale(1); animation: pulse 1.1s ease-in-out infinite; }
-    .halo { position: absolute; left: 28px; top: 2px; width: 54px; height: 54px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 227, 151, 0.32), rgba(255, 227, 151, 0)); opacity: 0; transform: scale(0.75); transition: opacity 220ms ease, transform 220ms ease; }
+    .halo { position: absolute; left: 22px; top: -2px; width: 48px; height: 48px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 227, 151, 0.32), rgba(255, 227, 151, 0)); opacity: 0; transform: scale(0.75); transition: opacity 220ms ease, transform 220ms ease; }
     .buddy[data-state="reward"] .halo { opacity: 1; transform: scale(1); }
-    .zzz { position: absolute; right: 12px; top: 14px; color: rgba(96, 67, 43, 0.86); font: 700 13px/1 "Segoe UI", sans-serif; letter-spacing: 0.04em; opacity: 0; transform: translateY(3px); transition: opacity 180ms ease, transform 180ms ease; text-shadow: 0 1px 0 rgba(255,255,255,0.45); }
+    .zzz { position: absolute; right: 16px; top: 8px; color: rgba(96, 67, 43, 0.86); font: 700 13px/1 "Segoe UI", sans-serif; letter-spacing: 0.04em; opacity: 0; transform: translateY(3px); transition: opacity 180ms ease, transform 180ms ease; text-shadow: 0 1px 0 rgba(255,255,255,0.45); }
     .buddy[data-mood="sleepy"] .zzz { opacity: 1; transform: translateY(0); }
-    .shadow { position: absolute; left: 20px; bottom: 12px; width: 62px; height: 14px; border-radius: 999px; background: rgba(33, 18, 10, 0.18); filter: blur(6px); }
+    .shadow { position: absolute; left: 26px; bottom: 10px; width: 46px; height: 12px; border-radius: 999px; background: rgba(33, 18, 10, 0.18); filter: blur(6px); }
     @keyframes breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(1px) scale(0.985); } }
     @keyframes work { 0%, 100% { transform: rotate(0deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(-2px); } }
     @keyframes walk-cycle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px) translateX(1px); } }

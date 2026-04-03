@@ -3,7 +3,7 @@ const DEFAULT_SETTINGS = {
   petName: "Momo",
   size: "medium",
   theme: "workshop",
-  petVariant: "raccoon",
+  petVariant: "classic",
   anchor: "bottom-right",
   positionMode: "anchor",
   customPosition: null,
