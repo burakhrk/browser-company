@@ -254,15 +254,126 @@ function createStyles() {
     .workshop,
     .crate,
     .progress { display: none !important; }
-    .raccoon { position: absolute; left: 26px; bottom: 16px; width: 48px; height: 88px; transition: transform 180ms ease; transform-origin: center bottom; }
+    .raccoon { position: absolute; left: 18px; bottom: 10px; width: 68px; height: 96px; transition: transform 180ms ease; transform-origin: center bottom; }
     .buddy[data-state="active"] .raccoon { animation: work 0.9s ease-in-out infinite; }
     .buddy[data-roam="walking"] .raccoon { animation: walk-cycle 0.64s ease-in-out infinite; }
     .buddy[data-mood="sleepy"] .raccoon { animation: sleepy 3.6s ease-in-out infinite; }
     .buddy[data-mood="annoyed"] .raccoon { animation: shake 0.28s ease-in-out 2; }
     .buddy[data-mood="proud"] .raccoon { animation: proud 1.2s ease-in-out infinite; }
-    .buddy[data-antic="wave"] .arm.right { animation: wave-arm 0.52s ease-in-out infinite; }
+    .buddy[data-antic="wave"] .sm-arm-right { animation: wave-arm 0.52s ease-in-out infinite; }
     .buddy[data-antic="trip"] .actor { animation: trip 0.54s ease; }
     .buddy[data-antic="spin"] .actor { animation: spin-pop 0.72s ease; }
+    .stickman-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    .sm-stroke {
+      fill: none;
+      stroke: #22201d;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .sm-outline {
+      fill: #fffdf7;
+      stroke: #22201d;
+      stroke-width: 4.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .sm-head-back {
+      fill: rgba(255, 255, 255, 0.92);
+      stroke: rgba(34, 32, 29, 0.84);
+      stroke-width: 3.6;
+      transform: translate(0.7px, 1px) rotate(-5deg);
+      transform-origin: center;
+    }
+    .sm-head-front {
+      fill: #fffdf7;
+      stroke: #22201d;
+      stroke-width: 3.8;
+    }
+    .sm-head-group,
+    .sm-arm-left,
+    .sm-arm-right,
+    .sm-leg-left,
+    .sm-leg-right,
+    .sm-tool-group {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .sm-head-group {
+      transform-origin: 34px 18px;
+    }
+    .sm-neck {
+      stroke: #22201d;
+      stroke-width: 4.6;
+    }
+    .sm-body-line {
+      stroke: #22201d;
+      stroke-width: 5.2;
+    }
+    .sm-accent {
+      fill: none;
+      stroke: var(--theme-accent);
+      stroke-width: 3.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .sm-hand,
+    .sm-foot {
+      fill: #22201d;
+    }
+    .sm-eye {
+      fill: #22201d;
+    }
+    .sm-brow,
+    .sm-mouth {
+      fill: none;
+      stroke: #22201d;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .sm-mask {
+      fill: none;
+      stroke: var(--mask-color);
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.95;
+    }
+    .sm-tool-handle {
+      fill: none;
+      stroke: #6b5c51;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+    .sm-tool-head {
+      fill: #d9dee3;
+      stroke: #5f666d;
+      stroke-width: 2;
+      stroke-linejoin: round;
+    }
+    .buddy[data-state="active"] .sm-head-group { animation: sm-nod 0.9s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .sm-head-group { animation: sm-head-bob 0.64s ease-in-out infinite; }
+    .buddy[data-state="active"] .sm-arm-left { animation: sm-left-arm-work 0.72s ease-in-out infinite; }
+    .buddy[data-state="active"] .sm-arm-right { animation: sm-right-arm-work 0.72s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .sm-arm-left { animation: sm-left-arm-walk 0.64s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .sm-arm-right { animation: sm-right-arm-walk 0.64s ease-in-out infinite; }
+    .buddy[data-state="active"] .sm-leg-left { animation: sm-left-leg-work 0.8s ease-in-out infinite; }
+    .buddy[data-state="active"] .sm-leg-right { animation: sm-right-leg-work 0.8s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .sm-leg-left { animation: sm-left-leg-walk 0.64s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .sm-leg-right { animation: sm-right-leg-walk 0.64s ease-in-out infinite; }
+    .buddy[data-state="active"] .sm-tool-group { animation: sm-tool-work 0.72s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .sm-tool-group { animation: sm-tool-sway 0.64s ease-in-out infinite; }
+    .buddy[data-mood="focused"] .sm-brow-left { transform: translateY(1px) rotate(10deg); }
+    .buddy[data-mood="focused"] .sm-brow-right { transform: translateY(1px) rotate(-10deg); }
+    .buddy[data-mood="annoyed"] .sm-brow-left { transform: translateY(-1px) rotate(18deg); }
+    .buddy[data-mood="annoyed"] .sm-brow-right { transform: translateY(-1px) rotate(-18deg); }
+    .buddy[data-mood="sleepy"] .sm-eye { transform: scaleY(0.25) translateY(2px); transform-box: fill-box; transform-origin: center; }
+    .buddy[data-mood="sleepy"] .sm-mouth { transform: scaleX(0.8) translateY(2px); transform-box: fill-box; transform-origin: center; }
+    .buddy[data-mood="proud"] .sm-mouth { transform: scale(1.08); transform-box: fill-box; transform-origin: center; }
     .tail,
     .apron,
     .mask,
@@ -404,6 +515,18 @@ function createStyles() {
     @keyframes left-arm { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(40deg) translateY(-1px); } }
     @keyframes right-arm { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-52deg) translateY(-2px); } }
     @keyframes wave-arm { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(-78deg) translateY(-1px); } }
+    @keyframes sm-nod { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-6deg) translateY(1px); } }
+    @keyframes sm-head-bob { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-3deg) translateY(1px); } }
+    @keyframes sm-left-arm-work { 0%, 100% { transform: rotate(16deg); } 50% { transform: rotate(28deg) translateY(-1px); } }
+    @keyframes sm-right-arm-work { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(-58deg) translateY(-2px); } }
+    @keyframes sm-left-arm-walk { 0%, 100% { transform: rotate(22deg); } 50% { transform: rotate(38deg) translateY(1px); } }
+    @keyframes sm-right-arm-walk { 0%, 100% { transform: rotate(-24deg); } 50% { transform: rotate(-40deg) translateY(1px); } }
+    @keyframes sm-left-leg-work { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(10deg); } }
+    @keyframes sm-right-leg-work { 0%, 100% { transform: rotate(8deg); } 50% { transform: rotate(-8deg); } }
+    @keyframes sm-left-leg-walk { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(14deg) translateY(1px); } }
+    @keyframes sm-right-leg-walk { 0%, 100% { transform: rotate(12deg); } 50% { transform: rotate(-14deg) translateY(-1px); } }
+    @keyframes sm-tool-work { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(-40deg) translateY(-1px); } }
+    @keyframes sm-tool-sway { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(-4deg); } }
     @keyframes walk-arm-left { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(34deg) translateY(1px); } }
     @keyframes walk-arm-right { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-38deg) translateY(1px); } }
     @keyframes left-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(9deg); } }
@@ -453,9 +576,41 @@ function createMarkup() {
           <div class="zzz">Zz</div>
           <div class="workshop"><div class="crate"></div><div class="coin"></div><div class="progress"><div class="progress-fill"></div></div></div>
           <div class="raccoon">
-            <div class="tail"></div><div class="body"></div><div class="apron"></div>
-            <div class="head"><div class="mask"></div><div class="goggles"></div><div class="brow left"></div><div class="brow right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="snout"></div><div class="mouth"></div></div>
-            <div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div><div class="tool"></div>
+            <svg class="stickman-svg" viewBox="0 0 68 96" aria-hidden="true">
+              <g class="sm-head-group">
+                <circle class="sm-head-back" cx="31" cy="18" r="12.8"></circle>
+                <circle class="sm-head-front" cx="31" cy="18" r="12.2"></circle>
+                <path class="sm-mask" d="M20 18 Q31 12 42 18"></path>
+                <circle class="sm-eye" cx="27" cy="18" r="1.7"></circle>
+                <circle class="sm-eye" cx="35" cy="18" r="1.7"></circle>
+                <path class="sm-brow sm-brow-left" d="M23 13 L29 12"></path>
+                <path class="sm-brow sm-brow-right" d="M33 12 L39 13"></path>
+                <path class="sm-mouth" d="M27 24 Q31 26 35 24"></path>
+              </g>
+              <path class="sm-accent" d="M31 31 L39 35 L35 40"></path>
+              <path class="sm-stroke sm-neck" d="M31 30 L31 35"></path>
+              <path class="sm-stroke sm-body-line" d="M31 35 L31 60"></path>
+              <g class="sm-arm-left">
+                <path class="sm-stroke" style="stroke-width:4.6" d="M31 40 L21 52"></path>
+                <circle class="sm-hand" cx="20" cy="53" r="2.8"></circle>
+              </g>
+              <g class="sm-arm-right">
+                <path class="sm-stroke" style="stroke-width:4.6" d="M31 41 L44 50"></path>
+                <circle class="sm-hand" cx="45" cy="51" r="2.8"></circle>
+              </g>
+              <g class="sm-tool-group">
+                <path class="sm-tool-handle" d="M43 49 L51 57"></path>
+                <path class="sm-tool-head" d="M49 54 L58 51 L60 58 L52 61 Z"></path>
+              </g>
+              <g class="sm-leg-left">
+                <path class="sm-stroke" style="stroke-width:4.8" d="M31 60 L23 80"></path>
+                <circle class="sm-foot" cx="22" cy="82" r="3"></circle>
+              </g>
+              <g class="sm-leg-right">
+                <path class="sm-stroke" style="stroke-width:4.8" d="M31 60 L39 82"></path>
+                <circle class="sm-foot" cx="40" cy="84" r="3"></circle>
+              </g>
+            </svg>
           </div>
         </div>
       </div>

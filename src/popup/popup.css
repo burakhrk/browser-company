@@ -212,10 +212,109 @@ h2 {
   position: absolute;
   left: 50%;
   bottom: 12px;
-  width: 56px;
+  width: 62px;
   height: 98px;
   transform: translateX(-50%);
   animation: preview-bounce 1s ease-in-out infinite;
+}
+
+.preview-stickman {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ps-stroke {
+  fill: none;
+  stroke: #22201d;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ps-head-back {
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: rgba(34, 32, 29, 0.84);
+  stroke-width: 3.6;
+  transform: translate(0.7px, 1px) rotate(-5deg);
+  transform-origin: center;
+}
+
+.ps-head-front {
+  fill: #fffdf7;
+  stroke: #22201d;
+  stroke-width: 3.8;
+}
+
+.ps-mask {
+  fill: none;
+  stroke: var(--mask-color);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+}
+
+.ps-eye {
+  fill: #22201d;
+}
+
+.ps-mouth {
+  fill: none;
+  stroke: #22201d;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ps-accent {
+  fill: none;
+  stroke: var(--theme-accent);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+
+.ps-neck {
+  stroke-width: 4.6;
+}
+
+.ps-body-line {
+  stroke-width: 5.2;
+}
+
+.ps-limb {
+  stroke-width: 4.6;
+}
+
+.ps-leg {
+  stroke-width: 4.8;
+}
+
+.ps-head-group,
+.ps-arm-left,
+.ps-arm-right,
+.ps-leg-left,
+.ps-leg-right {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ps-head-group {
+  transform-origin: 34px 18px;
+  animation: preview-nod 0.9s ease-in-out infinite;
+}
+
+.ps-arm-left {
+  animation: preview-sm-left-arm 0.72s ease-in-out infinite;
+}
+
+.ps-arm-right {
+  animation: preview-sm-right-arm 0.72s ease-in-out infinite;
+}
+
+.ps-leg-left {
+  animation: preview-sm-left-leg 0.8s ease-in-out infinite;
+}
+
+.ps-leg-right {
+  animation: preview-sm-right-leg 0.8s ease-in-out infinite;
 }
 
 .preview-tail,
@@ -702,6 +801,16 @@ select:focus {
   50% { transform: rotate(-52deg) translateY(-2px); }
 }
 
+@keyframes preview-sm-left-arm {
+  0%, 100% { transform: rotate(16deg); }
+  50% { transform: rotate(28deg) translateY(-1px); }
+}
+
+@keyframes preview-sm-right-arm {
+  0%, 100% { transform: rotate(-12deg); }
+  50% { transform: rotate(-58deg) translateY(-2px); }
+}
+
 @keyframes preview-left-leg {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(9deg); }
@@ -710,6 +819,16 @@ select:focus {
 @keyframes preview-right-leg {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(-9deg); }
+}
+
+@keyframes preview-sm-left-leg {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@keyframes preview-sm-right-leg {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(-8deg); }
 }
 
 @keyframes hype-bars {
