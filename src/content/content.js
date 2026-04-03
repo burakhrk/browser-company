@@ -12,17 +12,15 @@ const DEFAULT_SETTINGS = {
   customPosition: null,
   personality: "hype",
   speech: true,
-  motivation: true,
   autoHop: true,
   roaming: true,
   gravityDrop: false
 };
 const DEFAULT_STATS = {
-  shinyBits: 0,
-  rewardsCollected: 0,
   pokes: 0,
   kicks: 0,
-  drags: 0
+  drags: 0,
+  steals: 0
 };
 
 const anchorPositions = [
@@ -97,28 +95,25 @@ const sizeMap = {
 
 const talkMap = {
   hype: {
-    active: ["We are cooking. Keep going.", "Tiny browser company is booming.", "Momentum acquired. Love that for us."],
+    active: ["We are cooking. Keep going.", "Tiny browser gremlin is thriving.", "Momentum acquired. Love that for us."],
     idle: ["I can wait. Tiny move is still a move.", "No stress. We can reboot in one click.", "I am chilling until you are back."],
     poke: ["Hey. I am literally on shift.", "Bonk received. Morale unchanged.", "Rude, but kind of funny."],
     kick: ["Okay wow, new corner it is.", "I am filing a tiny complaint.", "Relocating dramatically."],
-    reward: ["Fresh shiny bits ready.", "Look what I made.", "Reward drop. Come grab it."],
-    collect: ["Huge. Economy restored.", "Shiny bits secured.", "That one goes on the company ledger."]
+    steal: ["Hehe. Borrowing this.", "Temporary loot acquisition.", "I found a shiny thing."]
   },
   chill: {
     active: ["Nice pace. We are in a groove.", "Calm focus mode looks good on us.", "Steady energy. Tiny progress counts."],
     idle: ["I am just hanging out here.", "All good. We can ease back in.", "Taking a small breather."],
     poke: ["Soft bonk noted.", "I am still here, buddy.", "That was unnecessary but adorable."],
     kick: ["Sliding over a little.", "New view, same vibe.", "I will allow the relocation."],
-    reward: ["A little reward is ready.", "I made something nice.", "Tap me when you want the goodies."],
-    collect: ["Cute. We keep those.", "Collected and appreciated.", "That felt nice."]
+    steal: ["Just borrowing this for a second.", "Tiny keepsake acquired.", "This one looked cute."]
   },
   chaos: {
-    active: ["Browser empire expansion underway.", "We are so back.", "Absolutely thriving in here."],
+    active: ["Browser chaos underway.", "We are so back.", "Absolutely thriving in here."],
     idle: ["Resting before the next scheme.", "I am pretending to be harmless.", "Low motion. High potential."],
     poke: ["Violence in the workplace.", "You poke, I remember.", "I will recover and maybe unionize."],
     kick: ["Yeeted to another district.", "Corner change. Spirit unchanged.", "I have been launched."],
-    reward: ["Loot event detected.", "A suspiciously legal reward is ready.", "We made money somehow."],
-    collect: ["Funds acquired.", "Glorious little paycheck.", "Excellent. Back to operations."]
+    steal: ["Loot event detected.", "This is mine now. Briefly.", "Absolutely borrowing that."]
   }
 };
 
@@ -214,12 +209,6 @@ function createStyles() {
     .buddy[data-direction="left"] .actor { transform: scaleX(-1); }
     .buddy[data-falling="true"] .actor { animation: fall-squash 0.56s ease-in; }
     .buddy[data-impact="hit"] .actor { animation: hit-react 0.38s ease; }
-    .badge {
-      position: absolute; top: 8px; right: 6px; min-width: 24px; height: 24px; padding: 0 8px; display: flex; align-items: center; justify-content: center;
-      border-radius: 999px; background: linear-gradient(180deg, var(--theme-accent-soft), var(--theme-accent)); color: #5c2d00; font: 700 11px/1 "Segoe UI", sans-serif;
-      box-shadow: 0 8px 18px rgba(154, 100, 19, 0.22); opacity: 0; transform: translateY(6px) scale(0.85); transition: opacity 180ms ease, transform 180ms ease;
-    }
-    .buddy[data-state="reward"] .badge { opacity: 1; transform: translateY(0) scale(1); }
     .bubble {
       position: absolute; left: 50%; top: -6px; max-width: 170px; padding: 8px 10px; border-radius: 14px; background: rgba(49, 30, 16, 0.94); color: #fff5ea;
       font: 600 11px/1.3 "Segoe UI", sans-serif; text-align: center; transform: translate(-50%, -100%); opacity: 0; transition: opacity 180ms ease, transform 180ms ease;
@@ -229,7 +218,9 @@ function createStyles() {
     .buddy[data-bubble="true"] .bubble { opacity: 1; transform: translate(-50%, calc(-100% - 4px)); }
     .sparkles { position: absolute; inset: 0; pointer-events: none; }
     .spark { position: absolute; width: 8px; height: 8px; border-radius: 999px; background: radial-gradient(circle, var(--theme-accent-soft), var(--theme-accent) 65%, transparent 66%); opacity: 0; }
-    .buddy[data-state="active"] .spark, .buddy[data-state="reward"] .spark { opacity: 1; animation: spark 1.5s ease-in-out infinite; }
+    .buddy[data-state="active"] .spark,
+    .buddy[data-loot="true"] .spark,
+    .buddy[data-antic="spin"] .spark { opacity: 1; animation: spark 1.5s ease-in-out infinite; }
     .spark:nth-child(1) { left: 76px; top: 22px; animation-delay: 0s; }
     .spark:nth-child(2) { left: 92px; top: 34px; animation-delay: 0.4s; }
     .spark:nth-child(3) { left: 58px; top: 30px; animation-delay: 0.8s; }
@@ -265,11 +256,13 @@ function createStyles() {
     .progress { display: none !important; }
     .raccoon { position: absolute; left: 26px; bottom: 16px; width: 48px; height: 88px; transition: transform 180ms ease; transform-origin: center bottom; }
     .buddy[data-state="active"] .raccoon { animation: work 0.9s ease-in-out infinite; }
-    .buddy[data-state="reward"] .raccoon { transform: translateY(-4px); }
     .buddy[data-roam="walking"] .raccoon { animation: walk-cycle 0.64s ease-in-out infinite; }
     .buddy[data-mood="sleepy"] .raccoon { animation: sleepy 3.6s ease-in-out infinite; }
     .buddy[data-mood="annoyed"] .raccoon { animation: shake 0.28s ease-in-out 2; }
     .buddy[data-mood="proud"] .raccoon { animation: proud 1.2s ease-in-out infinite; }
+    .buddy[data-antic="wave"] .arm.right { animation: wave-arm 0.52s ease-in-out infinite; }
+    .buddy[data-antic="trip"] .actor { animation: trip 0.54s ease; }
+    .buddy[data-antic="spin"] .actor { animation: spin-pop 0.72s ease; }
     .tail,
     .apron,
     .mask,
@@ -324,13 +317,11 @@ function createStyles() {
     .mouth { position: absolute; left: 9px; bottom: 5px; width: 10px; height: 5px; border-radius: 0 0 10px 10px; border-bottom: 2px solid #6e4632; }
     .buddy[data-mood="sleepy"] .mouth { width: 8px; height: 2px; border-bottom-width: 1px; }
     .buddy[data-mood="annoyed"] .mouth { border-bottom: 0; border-top: 2px solid #6e4632; border-radius: 10px 10px 0 0; bottom: 6px; }
-    .buddy[data-mood="proud"] .mouth,
-    .buddy[data-state="reward"] .mouth { width: 12px; border-bottom-width: 3px; }
+    .buddy[data-mood="proud"] .mouth { width: 12px; border-bottom-width: 3px; }
     .blush { position: absolute; top: 22px; width: 8px; height: 5px; border-radius: 999px; background: rgba(255, 174, 132, 0.4); opacity: 0; transition: opacity 180ms ease; }
     .blush.left { left: 9px; }
     .blush.right { right: 8px; }
-    .buddy[data-mood="proud"] .blush,
-    .buddy[data-state="reward"] .blush { opacity: 1; }
+    .buddy[data-mood="proud"] .blush { opacity: 1; }
     .goggles {
       position: absolute;
       left: 2px;
@@ -369,14 +360,11 @@ function createStyles() {
     .tool::after { content: ""; position: absolute; right: -2px; top: -3px; width: 8px; height: 10px; border-radius: 3px; background: linear-gradient(180deg, #f0f3f6, #96a1a8); }
     .buddy[data-state="active"] .tool { animation: tool-work 0.72s ease-in-out infinite; }
     .buddy[data-roam="walking"] .tool { animation: tool-sway 0.64s ease-in-out infinite; }
-    .crate { position: absolute; right: 16px; bottom: 28px; width: 30px; height: 26px; border-radius: 9px; background: linear-gradient(180deg, #9b6a43, #6e4327); box-shadow: inset 0 2px 0 rgba(255, 244, 222, 0.16); }
-    .crate::before, .crate::after { content: ""; position: absolute; left: 5px; right: 5px; height: 3px; border-radius: 999px; background: rgba(74, 41, 23, 0.6); }
-    .crate::before { top: 8px; }
-    .crate::after { bottom: 7px; }
-    .coin { position: absolute; right: 12px; bottom: 44px; width: 20px; height: 20px; border-radius: 999px; background: radial-gradient(circle at 30% 30%, #fff1b0, #f3b03e 70%, #a66a13); border: 2px solid rgba(255, 236, 190, 0.35); opacity: 0; transform: scale(0.6); transition: opacity 180ms ease, transform 180ms ease; }
-    .buddy[data-state="reward"] .coin { opacity: 1; transform: scale(1); animation: pulse 1.1s ease-in-out infinite; }
+    .crate { display: none !important; }
+    .coin { display: none !important; }
     .halo { position: absolute; left: 22px; top: -2px; width: 48px; height: 48px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 227, 151, 0.32), rgba(255, 227, 151, 0)); opacity: 0; transform: scale(0.75); transition: opacity 220ms ease, transform 220ms ease; }
-    .buddy[data-state="reward"] .halo { opacity: 1; transform: scale(1); }
+    .buddy[data-loot="true"] .halo,
+    .buddy[data-antic="spin"] .halo { opacity: 1; transform: scale(1); }
     .zzz { position: absolute; right: 16px; top: 8px; color: rgba(96, 67, 43, 0.86); font: 700 13px/1 "Segoe UI", sans-serif; letter-spacing: 0.04em; opacity: 0; transform: translateY(3px); transition: opacity 180ms ease, transform 180ms ease; text-shadow: 0 1px 0 rgba(255,255,255,0.45); }
     .buddy[data-mood="sleepy"] .zzz { opacity: 1; transform: translateY(0); }
     .shadow { position: absolute; left: 26px; bottom: 10px; width: 46px; height: 12px; border-radius: 999px; background: rgba(33, 18, 10, 0.18); filter: blur(6px); }
@@ -415,6 +403,7 @@ function createStyles() {
     @keyframes head-bob { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-3deg) translateY(1px); } }
     @keyframes left-arm { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(40deg) translateY(-1px); } }
     @keyframes right-arm { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-52deg) translateY(-2px); } }
+    @keyframes wave-arm { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(-78deg) translateY(-1px); } }
     @keyframes walk-arm-left { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(34deg) translateY(1px); } }
     @keyframes walk-arm-right { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-38deg) translateY(1px); } }
     @keyframes left-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(9deg); } }
@@ -430,6 +419,17 @@ function createStyles() {
       52% { transform: translateX(4px) rotate(5deg); }
       100% { transform: translateX(0) rotate(0deg); }
     }
+    @keyframes trip {
+      0% { transform: translateX(0) rotate(0deg); }
+      30% { transform: translateX(6px) rotate(12deg); }
+      65% { transform: translateX(-2px) rotate(-7deg); }
+      100% { transform: translateX(0) rotate(0deg); }
+    }
+    @keyframes spin-pop {
+      0% { transform: rotate(0deg) scale(1); }
+      55% { transform: rotate(320deg) scale(1.06); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
     @keyframes fall-squash {
       0% { transform: translateY(-6px) scaleY(1.02); }
       70% { transform: translateY(0) scaleY(1); }
@@ -443,7 +443,6 @@ function createMarkup() {
   return `
     <div class="buddy" data-state="idle" aria-label="Browser Buddy companion" title="Browser Buddy">
       <div class="bubble" role="status" aria-live="polite">Momo is hanging out.</div>
-      <div class="badge">+</div>
       <div class="scene">
         <div class="actor">
           <div class="sparkles"><div class="spark"></div><div class="spark"></div><div class="spark"></div></div>
@@ -498,20 +497,17 @@ function mountBuddy() {
   const buddy = shadowRoot.querySelector(".buddy");
   const scene = shadowRoot.querySelector(".scene");
   const bubble = shadowRoot.querySelector(".bubble");
-  const progressFill = shadowRoot.querySelector(".progress-fill");
   const loot = shadowRoot.querySelector(".loot");
 
   let settings = { ...DEFAULT_SETTINGS };
   let stats = { ...DEFAULT_STATS };
-  let momentum = 24;
-  let rewardReady = false;
   let bubbleTimer = null;
-  let rewardTimer = 0;
   let intervalId = null;
   let roamingTimer = null;
   let homePosition = { x: 0, y: 0 };
   let lootTimer = null;
   let stolenImageTarget = null;
+  let anticTimer = null;
 
   function getBuddyPosition() {
     return {
@@ -563,6 +559,37 @@ function mountBuddy() {
     buddy.dataset.loot = "false";
   }
 
+  function setAntic(name, duration = 700) {
+    window.clearTimeout(anticTimer);
+    buddy.dataset.antic = name;
+    anticTimer = window.setTimeout(() => {
+      buddy.dataset.antic = "none";
+    }, duration);
+  }
+
+  function attemptFunnyAntic() {
+    if (activeDrag || stolenImageTarget) return;
+    if (Math.random() > 0.34) return;
+
+    if (Math.random() > 0.5) {
+      buddy.dataset.mood = "proud";
+      setAntic("wave", 1100);
+      if (settings.speech) {
+        showMessage("Tiny wave from your browser goblin.", 900);
+      }
+      return;
+    }
+
+    buddy.dataset.mood = "annoyed";
+    setAntic(Math.random() > 0.5 ? "trip" : "spin", 720);
+    if (settings.speech) {
+      showMessage("Whoops. Totally meant to do that.", 900);
+    }
+    window.setTimeout(() => {
+      buddy.dataset.mood = Date.now() < activityUntil ? "focused" : "calm";
+    }, 760);
+  }
+
   function isStealableImage(image) {
     if (!(image instanceof HTMLImageElement)) return false;
     if (!image.currentSrc || !image.complete) return false;
@@ -577,7 +604,7 @@ function mountBuddy() {
   }
 
   function attemptImageHeist() {
-    if (!settings.enabled || buddy.hidden || activeDrag || rewardReady) return;
+    if (!settings.enabled || buddy.hidden || activeDrag) return;
     if (Date.now() < imageHeistCooldownUntil) return;
     if (Date.now() < activityUntil) return;
     if (stolenImageTarget) return;
@@ -596,8 +623,9 @@ function mountBuddy() {
     loot.style.height = `${size}px`;
     buddy.dataset.loot = "true";
     buddy.dataset.mood = "proud";
+    stats = bumpStat(stats, "steals");
     imageHeistCooldownUntil = Date.now() + 18000;
-    showMessage("Hehe. Borrowing this.", 1200);
+    showMessage(pickLine(settings.personality, "steal"), 1200);
 
     lootTimer = window.setTimeout(() => {
       buddy.dataset.mood = buddy.dataset.state === "active" ? "focused" : "calm";
@@ -608,7 +636,7 @@ function mountBuddy() {
   function applySettings() {
     currentAnchorIndex = getAnchorIndexByName(settings.anchor);
     const theme = themeMap[settings.theme] || themeMap.workshop;
-    const variant = variantMap[settings.petVariant] || variantMap.raccoon;
+    const variant = variantMap[settings.petVariant] || variantMap.classic;
     const scale = sizeMap[settings.size] || sizeMap.medium;
     const nextPosition = settings.positionMode === "custom" && settings.customPosition
       ? {
@@ -646,29 +674,16 @@ function mountBuddy() {
     if (!settings.enabled) return;
     const isActive = Date.now() < activityUntil;
 
-    if (rewardReady) {
-      buddy.dataset.state = "reward";
-      buddy.dataset.mood = "proud";
-      progressFill.style.width = "100%";
-      return;
-    }
-
     if (isActive) {
-      momentum = Math.min(100, momentum + 1.2);
       buddy.dataset.state = "active";
-      buddy.dataset.mood = momentum > 72 ? "focused" : "calm";
+      if (!stolenImageTarget) {
+        buddy.dataset.mood = "focused";
+      }
     } else {
-      momentum = Math.max(8, momentum - 0.7);
       buddy.dataset.state = "idle";
-      buddy.dataset.mood = momentum < 24 ? "sleepy" : "calm";
-    }
-
-    progressFill.style.width = `${momentum}%`;
-    rewardTimer += isActive ? 1 : 0;
-
-    if (momentum > 88 && rewardTimer > 60) {
-      rewardReady = true;
-      showMessage(pickLine(settings.personality, "reward"), 1800);
+      if (!stolenImageTarget) {
+        buddy.dataset.mood = "sleepy";
+      }
     }
   }
 
@@ -687,9 +702,7 @@ function mountBuddy() {
 
     window.setTimeout(() => {
       buddy.dataset.kicked = "false";
-      if (buddy.dataset.state === "reward") {
-        buddy.dataset.mood = "proud";
-      } else if (buddy.dataset.state === "active") {
+      if (buddy.dataset.state === "active") {
         buddy.dataset.mood = "focused";
       } else {
         buddy.dataset.mood = "calm";
@@ -718,19 +731,6 @@ function mountBuddy() {
     moveToAnchor(nextAnchorIndex, pickLine(settings.personality, "kick"));
   }
 
-  function collectReward() {
-    rewardReady = false;
-    rewardTimer = 0;
-    momentum = 32;
-    stats = bumpStat(stats, "rewardsCollected");
-    stats = bumpStat(stats, "shinyBits", 8);
-    buddy.dataset.state = "active";
-    buddy.dataset.mood = "proud";
-    progressFill.style.width = `${momentum}%`;
-    clearLoot();
-    showMessage(pickLine(settings.personality, "collect"), 1600);
-  }
-
   function markActivity() {
     activityUntil = Date.now() + ACTIVITY_WINDOW_MS;
   }
@@ -757,7 +757,7 @@ function mountBuddy() {
 
   function roamNearHome() {
     if (!settings.enabled || !settings.roaming || activeDrag) return;
-    if (Date.now() < activityUntil || rewardReady) {
+    if (Date.now() < activityUntil) {
       buddy.dataset.roam = "idle";
       return;
     }
@@ -780,6 +780,7 @@ function mountBuddy() {
         setBuddyPosition(settings.gravityDrop ? { x: homePosition.x, y: getFloorY() } : homePosition);
       }
       attemptImageHeist();
+      attemptFunnyAntic();
     }, 900);
   }
 
@@ -881,11 +882,6 @@ function mountBuddy() {
       return;
     }
 
-    if (rewardReady) {
-      collectReward();
-      return;
-    }
-
     stats = bumpStat(stats, "pokes");
 
     const now = Date.now();
@@ -895,14 +891,15 @@ function mountBuddy() {
       buddy.dataset.mood = "annoyed";
       pulseImpact();
       window.setTimeout(() => {
-        if (buddy.dataset.state === "reward") {
-          buddy.dataset.mood = "proud";
-        } else if (Date.now() < activityUntil) {
+        if (Date.now() < activityUntil) {
           buddy.dataset.mood = "focused";
         } else {
           buddy.dataset.mood = "calm";
         }
       }, 420);
+      if (Math.random() > 0.55) {
+        setAntic("wave", 800);
+      }
       showMessage(pickLine(settings.personality, "poke"), 1200);
     }
     lastTapAt = now;
@@ -911,14 +908,14 @@ function mountBuddy() {
   scene.addEventListener("mouseenter", () => {
     if (!settings.speech) return;
 
-    if (rewardReady) {
-      showMessage("Tap me. I made a thing.", 900);
+    if (stolenImageTarget) {
+      showMessage("Look what I borrowed.", 900);
       return;
     }
 
     if (Date.now() < activityUntil) {
       showMessage(pickLine(settings.personality, "active"), 900);
-    } else if (settings.motivation) {
+    } else {
       showMessage(pickLine(settings.personality, "idle"), 900);
     }
   });

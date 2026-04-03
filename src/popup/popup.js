@@ -9,18 +9,16 @@ const DEFAULT_SETTINGS = {
   customPosition: null,
   personality: "hype",
   speech: true,
-  motivation: true,
   autoHop: true,
   roaming: true,
   gravityDrop: false
 };
 
 const DEFAULT_STATS = {
-  shinyBits: 0,
-  rewardsCollected: 0,
   pokes: 0,
   kicks: 0,
-  drags: 0
+  drags: 0,
+  steals: 0
 };
 
 const settingsFields = [
@@ -32,7 +30,6 @@ const settingsFields = [
   "anchor",
   "personality",
   "speech",
-  "motivation",
   "autoHop",
   "roaming",
   "gravityDrop"
@@ -69,8 +66,8 @@ function activateTab(tabName) {
 
 function renderHero(settings, stats) {
   $("heroTitle").textContent = `${settings.petName || "Momo"} is on shift.`;
-  $("heroBits").textContent = String(stats.shinyBits || 0);
-  $("heroRewards").textContent = String(stats.rewardsCollected || 0);
+  $("heroPokes").textContent = String(stats.pokes || 0);
+  $("heroSteals").textContent = String(stats.steals || 0);
   $("heroMood").textContent =
     settings.personality === "chaos" ? "Chaos" : settings.personality === "chill" ? "Chill" : "Hype";
   $("heroPosition").textContent =
@@ -91,7 +88,7 @@ function renderStats(stats) {
   $("pokesValue").textContent = String(stats.pokes || 0);
   $("kicksValue").textContent = String(stats.kicks || 0);
   $("dragsValue").textContent = String(stats.drags || 0);
-  $("rewardsValue").textContent = String(stats.rewardsCollected || 0);
+  $("stealsValue").textContent = String(stats.steals || 0);
 }
 
 function renderSettings(settings) {
@@ -123,7 +120,6 @@ function collectSettingsFromForm() {
     anchor: $("anchor").value,
     personality: $("personality").value,
     speech: $("speech").checked,
-    motivation: $("motivation").checked,
     autoHop: $("autoHop").checked,
     roaming: $("roaming").checked,
     gravityDrop: $("gravityDrop").checked

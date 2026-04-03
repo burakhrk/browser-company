@@ -9,18 +9,16 @@ const DEFAULT_SETTINGS = {
   customPosition: null,
   personality: "hype",
   speech: true,
-  motivation: true,
   autoHop: true,
   roaming: true,
   gravityDrop: false
 };
 
 const DEFAULT_STATS = {
-  shinyBits: 0,
-  rewardsCollected: 0,
   pokes: 0,
   kicks: 0,
-  drags: 0
+  drags: 0,
+  steals: 0
 };
 
 function mergeDefaults(currentValue, defaults) {

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Browser Buddy",
   "version": "0.2.0",
-  "description": "A playful browser companion that hangs out on webpages, reacts to your momentum, and keeps work a little less lonely.",
+  "description": "A funny browser buddy that hangs out on webpages, wanders around, steals tiny things, and reacts to your pokes.",
   "action": {
     "default_title": "Browser Buddy",
     "default_popup": "src/popup/popup.html"
