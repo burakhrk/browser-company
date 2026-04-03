@@ -185,8 +185,8 @@ function createStyles() {
       position: fixed;
       left: 0;
       top: 0;
-      width: 136px;
-      height: 152px;
+      width: 110px;
+      height: 122px;
       z-index: 2147483647;
       user-select: none;
       pointer-events: auto;
@@ -197,13 +197,22 @@ function createStyles() {
     }
     .buddy[hidden] { display: none !important; }
     .buddy[data-state="active"] { animation: bounce 1.3s ease-in-out infinite; }
-    .buddy[data-roam="walking"] { animation: stride 0.9s ease-in-out infinite; }
+    .buddy[data-roam="walking"] { animation: stride 0.82s ease-in-out infinite; }
     .buddy[data-state="idle"] .raccoon { animation: breathe 2.8s ease-in-out infinite; }
     .buddy[data-kicked="true"] { transform: rotate(-8deg) scale(calc(var(--buddy-scale) * 0.97)); }
     .buddy[data-dragging="true"] { transition: none; transform: scale(calc(var(--buddy-scale) * 1.03)); filter: drop-shadow(0 24px 36px rgba(35, 18, 8, 0.28)); }
     .buddy[data-falling="true"] { transition: top 520ms cubic-bezier(0.2, 0.78, 0.18, 1.06), left 220ms ease, transform 160ms ease; }
     .scene { position: relative; width: 100%; height: 100%; cursor: grab; }
     .scene:active { cursor: grabbing; }
+    .actor {
+      position: absolute;
+      inset: 0;
+      transform-origin: center bottom;
+      transition: transform 180ms ease;
+    }
+    .buddy[data-direction="left"] .actor { transform: scaleX(-1); }
+    .buddy[data-falling="true"] .actor { animation: fall-squash 0.56s ease-in; }
+    .buddy[data-impact="hit"] .actor { animation: hit-react 0.38s ease; }
     .badge {
       position: absolute; top: 8px; right: 6px; min-width: 24px; height: 24px; padding: 0 8px; display: flex; align-items: center; justify-content: center;
       border-radius: 999px; background: linear-gradient(180deg, var(--theme-accent-soft), var(--theme-accent)); color: #5c2d00; font: 700 11px/1 "Segoe UI", sans-serif;
@@ -223,20 +232,40 @@ function createStyles() {
     .spark:nth-child(1) { left: 76px; top: 22px; animation-delay: 0s; }
     .spark:nth-child(2) { left: 92px; top: 34px; animation-delay: 0.4s; }
     .spark:nth-child(3) { left: 58px; top: 30px; animation-delay: 0.8s; }
-    .workshop {
-      position: absolute; left: 8px; right: 8px; bottom: 0; height: 90px; border-radius: 24px 24px 28px 28px;
-      background: radial-gradient(circle at top center, rgba(255, 225, 165, 0.36), transparent 48%), linear-gradient(180deg, var(--theme-workshop-top), var(--theme-workshop-bottom) 62%, #23140b);
-      box-shadow: inset 0 2px 0 rgba(255, 241, 218, 0.2), 0 14px 28px rgba(48, 29, 18, 0.18); overflow: hidden;
+    .impact {
+      position: absolute;
+      left: 50px;
+      top: 4px;
+      width: 18px;
+      height: 18px;
+      opacity: 0;
+      transform: scale(0.4) rotate(-10deg);
+      transition: opacity 120ms ease, transform 120ms ease;
+      pointer-events: none;
     }
-    .workshop::before {
-      content: ""; position: absolute; inset: auto 8px 12px 8px; height: 24px; border-radius: 14px;
-      background: repeating-linear-gradient(90deg, #79563d 0 14px, #6b4933 14px 28px); opacity: 0.92;
+    .impact::before,
+    .impact::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(50% 0%, 63% 33%, 100% 33%, 70% 54%, 82% 100%, 50% 71%, 18% 100%, 30% 54%, 0% 33%, 37% 33%);
+      background: linear-gradient(180deg, #fff4bc, #ffb655 68%, #e26d36);
     }
-    .progress { position: absolute; left: 12px; right: 12px; bottom: 18px; height: 8px; border-radius: 999px; background: rgba(255, 243, 228, 0.12); overflow: hidden; }
-    .progress-fill { width: 24%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--theme-accent-soft), var(--theme-accent)); transition: width 260ms ease; box-shadow: 0 0 16px rgba(255, 199, 96, 0.4); }
-    .raccoon { position: absolute; left: 31px; bottom: 36px; width: 78px; height: 82px; transition: transform 180ms ease; transform-origin: center bottom; }
+    .impact::after {
+      inset: 4px;
+      background: linear-gradient(180deg, #fff9dc, #ffd77d 65%, #ff9860);
+    }
+    .buddy[data-impact="hit"] .impact {
+      opacity: 1;
+      transform: scale(1) rotate(8deg);
+    }
+    .workshop,
+    .crate,
+    .progress { display: none !important; }
+    .raccoon { position: absolute; left: 16px; bottom: 18px; width: 78px; height: 82px; transition: transform 180ms ease; transform-origin: center bottom; }
     .buddy[data-state="active"] .raccoon { animation: work 0.9s ease-in-out infinite; }
     .buddy[data-state="reward"] .raccoon { transform: translateY(-4px); }
+    .buddy[data-roam="walking"] .raccoon { animation: walk-cycle 0.64s ease-in-out infinite; }
     .buddy[data-mood="sleepy"] .raccoon { animation: sleepy 3.6s ease-in-out infinite; }
     .buddy[data-mood="annoyed"] .raccoon { animation: shake 0.28s ease-in-out 2; }
     .buddy[data-mood="proud"] .raccoon { animation: proud 1.2s ease-in-out infinite; }
@@ -246,6 +275,7 @@ function createStyles() {
     .apron { position: absolute; left: 18px; bottom: 7px; width: 40px; height: 32px; border-radius: 16px; background: linear-gradient(180deg, var(--theme-apron-top), var(--theme-apron-bottom)); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2); }
     .head { position: absolute; left: 16px; top: 6px; width: 46px; height: 42px; border-radius: 22px; background: linear-gradient(180deg, var(--fur-top), var(--fur-bottom)); box-shadow: inset 0 3px 0 rgba(255, 235, 210, 0.24); transform-origin: center bottom; }
     .buddy[data-state="active"] .head { animation: nod 0.9s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .head { animation: head-bob 0.64s ease-in-out infinite; }
     .head::before, .head::after { content: ""; position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 4px 16px 5px 16px; background: linear-gradient(180deg, var(--ear-top), var(--ear-bottom)); }
     .head::before { left: 4px; transform: rotate(-24deg); }
     .head::after { right: 4px; transform: scaleX(-1) rotate(-24deg); }
@@ -287,26 +317,33 @@ function createStyles() {
     .arm.right { right: 8px; transform: rotate(-22deg); }
     .buddy[data-state="active"] .arm.left { animation: left-arm 0.72s ease-in-out infinite; }
     .buddy[data-state="active"] .arm.right { animation: right-arm 0.72s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .arm.left { animation: walk-arm-left 0.64s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .arm.right { animation: walk-arm-right 0.64s ease-in-out infinite; }
     .leg { position: absolute; bottom: -4px; width: 10px; height: 18px; border-radius: 999px; background: linear-gradient(180deg, #9d6139, #734525); transform-origin: top center; }
     .leg.left { left: 21px; }
     .leg.right { left: 39px; }
     .buddy[data-state="active"] .leg.left { animation: left-leg 0.8s ease-in-out infinite; }
     .buddy[data-state="active"] .leg.right { animation: right-leg 0.8s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .leg.left { animation: walk-leg-left 0.64s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .leg.right { animation: walk-leg-right 0.64s ease-in-out infinite; }
     .tool { position: absolute; right: -4px; top: 53px; width: 26px; height: 7px; border-radius: 999px; background: #7c604d; transform: rotate(-24deg); }
     .tool::after { content: ""; position: absolute; right: -3px; top: -6px; width: 14px; height: 16px; border-radius: 5px; background: linear-gradient(180deg, #f0f3f6, #96a1a8); }
+    .buddy[data-state="active"] .tool { animation: tool-work 0.72s ease-in-out infinite; }
+    .buddy[data-roam="walking"] .tool { animation: tool-sway 0.64s ease-in-out infinite; }
     .crate { position: absolute; right: 16px; bottom: 28px; width: 30px; height: 26px; border-radius: 9px; background: linear-gradient(180deg, #9b6a43, #6e4327); box-shadow: inset 0 2px 0 rgba(255, 244, 222, 0.16); }
     .crate::before, .crate::after { content: ""; position: absolute; left: 5px; right: 5px; height: 3px; border-radius: 999px; background: rgba(74, 41, 23, 0.6); }
     .crate::before { top: 8px; }
     .crate::after { bottom: 7px; }
-    .coin { position: absolute; right: 24px; bottom: 54px; width: 20px; height: 20px; border-radius: 999px; background: radial-gradient(circle at 30% 30%, #fff1b0, #f3b03e 70%, #a66a13); border: 2px solid rgba(255, 236, 190, 0.35); opacity: 0; transform: scale(0.6); transition: opacity 180ms ease, transform 180ms ease; }
+    .coin { position: absolute; right: 12px; bottom: 58px; width: 20px; height: 20px; border-radius: 999px; background: radial-gradient(circle at 30% 30%, #fff1b0, #f3b03e 70%, #a66a13); border: 2px solid rgba(255, 236, 190, 0.35); opacity: 0; transform: scale(0.6); transition: opacity 180ms ease, transform 180ms ease; }
     .buddy[data-state="reward"] .coin { opacity: 1; transform: scale(1); animation: pulse 1.1s ease-in-out infinite; }
-    .halo { position: absolute; left: 34px; top: 6px; width: 54px; height: 54px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 227, 151, 0.32), rgba(255, 227, 151, 0)); opacity: 0; transform: scale(0.75); transition: opacity 220ms ease, transform 220ms ease; }
+    .halo { position: absolute; left: 28px; top: 2px; width: 54px; height: 54px; border-radius: 999px; background: radial-gradient(circle, rgba(255, 227, 151, 0.32), rgba(255, 227, 151, 0)); opacity: 0; transform: scale(0.75); transition: opacity 220ms ease, transform 220ms ease; }
     .buddy[data-state="reward"] .halo { opacity: 1; transform: scale(1); }
-    .zzz { position: absolute; right: 24px; top: 18px; color: rgba(255, 250, 241, 0.86); font: 700 13px/1 "Segoe UI", sans-serif; letter-spacing: 0.04em; opacity: 0; transform: translateY(3px); transition: opacity 180ms ease, transform 180ms ease; }
+    .zzz { position: absolute; right: 12px; top: 14px; color: rgba(96, 67, 43, 0.86); font: 700 13px/1 "Segoe UI", sans-serif; letter-spacing: 0.04em; opacity: 0; transform: translateY(3px); transition: opacity 180ms ease, transform 180ms ease; text-shadow: 0 1px 0 rgba(255,255,255,0.45); }
     .buddy[data-mood="sleepy"] .zzz { opacity: 1; transform: translateY(0); }
-    .shadow { position: absolute; left: 23px; bottom: 16px; width: 76px; height: 18px; border-radius: 999px; background: rgba(33, 18, 10, 0.18); filter: blur(6px); }
+    .shadow { position: absolute; left: 20px; bottom: 12px; width: 62px; height: 14px; border-radius: 999px; background: rgba(33, 18, 10, 0.18); filter: blur(6px); }
     @keyframes breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(1px) scale(0.985); } }
     @keyframes work { 0%, 100% { transform: rotate(0deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(-2px); } }
+    @keyframes walk-cycle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px) translateX(1px); } }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
     @keyframes blink { 0%, 45%, 100% { transform: scaleY(1); } 48%, 52% { transform: scaleY(0.2); } }
     @keyframes spark { 0%, 100% { transform: translateY(0) scale(0.7); opacity: 0.1; } 50% { transform: translateY(-10px) scale(1); opacity: 1; } }
@@ -316,11 +353,30 @@ function createStyles() {
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px) rotate(-2deg); } 75% { transform: translateX(2px) rotate(2deg); } }
     @keyframes proud { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(-7px); } }
     @keyframes nod { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-5deg) translateY(1px); } }
+    @keyframes head-bob { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-3deg) translateY(1px); } }
     @keyframes left-arm { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(40deg) translateY(-1px); } }
     @keyframes right-arm { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-52deg) translateY(-2px); } }
+    @keyframes walk-arm-left { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(34deg) translateY(1px); } }
+    @keyframes walk-arm-right { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-38deg) translateY(1px); } }
     @keyframes left-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(9deg); } }
     @keyframes right-leg { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg); } }
+    @keyframes walk-leg-left { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(14deg) translateY(1px); } }
+    @keyframes walk-leg-right { 0%, 100% { transform: rotate(12deg); } 50% { transform: rotate(-12deg) translateY(-1px); } }
     @keyframes stride { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    @keyframes tool-work { 0%, 100% { transform: rotate(-24deg); } 50% { transform: rotate(-42deg) translateY(-1px); } }
+    @keyframes tool-sway { 0%, 100% { transform: rotate(-24deg); } 50% { transform: rotate(-12deg); } }
+    @keyframes hit-react {
+      0% { transform: translateX(0) rotate(0deg); }
+      20% { transform: translateX(-6px) rotate(-8deg); }
+      52% { transform: translateX(4px) rotate(5deg); }
+      100% { transform: translateX(0) rotate(0deg); }
+    }
+    @keyframes fall-squash {
+      0% { transform: translateY(-6px) scaleY(1.02); }
+      70% { transform: translateY(0) scaleY(1); }
+      82% { transform: translateY(2px) scaleY(0.92) scaleX(1.06); }
+      100% { transform: translateY(0) scaleY(1) scaleX(1); }
+    }
   `;
 }
 
@@ -330,15 +386,18 @@ function createMarkup() {
       <div class="bubble" role="status" aria-live="polite">Momo is hanging out.</div>
       <div class="badge">+</div>
       <div class="scene">
-        <div class="sparkles"><div class="spark"></div><div class="spark"></div><div class="spark"></div></div>
-        <div class="shadow"></div>
-        <div class="halo"></div>
-        <div class="zzz">Zz</div>
-        <div class="workshop"><div class="crate"></div><div class="coin"></div><div class="progress"><div class="progress-fill"></div></div></div>
-        <div class="raccoon">
-          <div class="tail"></div><div class="body"></div><div class="apron"></div>
-          <div class="head"><div class="mask"></div><div class="goggles"></div><div class="brow left"></div><div class="brow right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="snout"></div><div class="mouth"></div></div>
-          <div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div><div class="tool"></div>
+        <div class="actor">
+          <div class="sparkles"><div class="spark"></div><div class="spark"></div><div class="spark"></div></div>
+          <div class="impact"></div>
+          <div class="shadow"></div>
+          <div class="halo"></div>
+          <div class="zzz">Zz</div>
+          <div class="workshop"><div class="crate"></div><div class="coin"></div><div class="progress"><div class="progress-fill"></div></div></div>
+          <div class="raccoon">
+            <div class="tail"></div><div class="body"></div><div class="apron"></div>
+            <div class="head"><div class="mask"></div><div class="goggles"></div><div class="brow left"></div><div class="brow right"></div><div class="eye left"></div><div class="eye right"></div><div class="blush left"></div><div class="blush right"></div><div class="snout"></div><div class="mouth"></div></div>
+            <div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div><div class="tool"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -403,6 +462,17 @@ function mountBuddy() {
     buddy.style.top = `${nextPosition.y}px`;
   }
 
+  function setDirection(fromX, toX) {
+    buddy.dataset.direction = toX < fromX ? "left" : "right";
+  }
+
+  function pulseImpact() {
+    buddy.dataset.impact = "hit";
+    window.setTimeout(() => {
+      buddy.dataset.impact = "none";
+    }, 380);
+  }
+
   function getFloorY() {
     return clamp(window.innerHeight - buddy.offsetHeight - 8, 8, window.innerHeight - buddy.offsetHeight - 8);
   }
@@ -433,6 +503,7 @@ function mountBuddy() {
       : resolveAnchorPosition(currentAnchorIndex);
 
     buddy.hidden = !settings.enabled;
+    setDirection(getBuddyPosition().x || nextPosition.x, nextPosition.x);
     setBuddyPosition(nextPosition);
     homePosition = { ...nextPosition };
     buddy.style.setProperty("--buddy-scale", scale);
@@ -490,6 +561,7 @@ function mountBuddy() {
     settings.customPosition = null;
     saveSettings();
     const nextPosition = resolveAnchorPosition(anchorIndex);
+    setDirection(getBuddyPosition().x || nextPosition.x, nextPosition.x);
     setBuddyPosition(nextPosition);
     homePosition = { ...nextPosition };
     buddy.dataset.kicked = "true";
@@ -518,6 +590,7 @@ function mountBuddy() {
 
   function kickToAnotherSpot() {
     if (!settings.autoHop) {
+      pulseImpact();
       showMessage(pickLine(settings.personality, "poke"), 1000);
       return;
     }
@@ -556,9 +629,11 @@ function mountBuddy() {
     const push = (120 - distance) / 120 * 26;
     const nextX = clamp(currentPosition.x + (dx / distance) * push, 8, window.innerWidth - buddy.offsetWidth - 8);
     const nextY = clamp(currentPosition.y + (dy / distance) * push, 8, window.innerHeight - buddy.offsetHeight - 8);
+    setDirection(currentPosition.x, nextX);
     setBuddyPosition({ x: nextX, y: nextY });
     buddy.dataset.mood = "annoyed";
     buddy.dataset.roam = "walking";
+    pulseImpact();
   }
 
   function roamNearHome() {
@@ -577,14 +652,13 @@ function mountBuddy() {
 
     const currentPosition = getBuddyPosition();
     buddy.dataset.roam = "walking";
-    buddy.style.transform = `${target.x < currentPosition.x ? "scaleX(-1) " : ""}scale(var(--buddy-scale))`;
+    setDirection(currentPosition.x, target.x);
     setBuddyPosition(target);
 
     window.setTimeout(() => {
       buddy.dataset.roam = "idle";
       if (settings.positionMode === "custom") {
         setBuddyPosition(settings.gravityDrop ? { x: homePosition.x, y: getFloorY() } : homePosition);
-        buddy.style.transform = "scale(var(--buddy-scale))";
       }
     }, 900);
   }
@@ -607,6 +681,7 @@ function mountBuddy() {
     pointerWasDrag = true;
     const nextX = clamp(event.clientX - activeDrag.offsetX, 8, window.innerWidth - buddy.offsetWidth - 8);
     const nextY = clamp(event.clientY - activeDrag.offsetY, 8, window.innerHeight - buddy.offsetHeight - 8);
+    setDirection(parseFloat(buddy.style.left || "0"), nextX);
     setBuddyPosition({ x: nextX, y: nextY });
   }
 
@@ -630,6 +705,7 @@ function mountBuddy() {
       saveSettings();
       buddy.dataset.falling = "true";
       buddy.dataset.roam = "walking";
+      setDirection(parseFloat(buddy.style.left || "0"), currentLeft);
       setBuddyPosition({ x: currentLeft, y: floorY });
       window.setTimeout(() => {
         buddy.dataset.falling = "false";
@@ -697,6 +773,7 @@ function mountBuddy() {
       kickToAnotherSpot();
     } else {
       buddy.dataset.mood = "annoyed";
+      pulseImpact();
       window.setTimeout(() => {
         if (buddy.dataset.state === "reward") {
           buddy.dataset.mood = "proud";
@@ -744,6 +821,7 @@ function mountBuddy() {
           y: clamp(settings.gravityDrop ? getFloorY() : settings.customPosition.y, 8, window.innerHeight - buddy.offsetHeight - 8)
         }
       : resolveAnchorPosition(currentAnchorIndex);
+    setDirection(parseFloat(buddy.style.left || "0"), nextPosition.x);
     setBuddyPosition(nextPosition);
     homePosition = { ...nextPosition };
   });

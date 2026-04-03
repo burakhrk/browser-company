@@ -73,7 +73,12 @@ function renderHero(settings, stats) {
   $("heroRewards").textContent = String(stats.rewardsCollected || 0);
   $("heroMood").textContent =
     settings.personality === "chaos" ? "Chaos" : settings.personality === "chill" ? "Chill" : "Hype";
-  $("heroPosition").textContent = settings.positionMode === "custom" ? "Manual" : "Corner";
+  $("heroPosition").textContent =
+    settings.gravityDrop && settings.positionMode === "custom"
+      ? "Floor"
+      : settings.positionMode === "custom"
+        ? "Manual"
+        : "Corner";
 }
 
 function renderPreview(settings) {
