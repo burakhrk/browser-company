@@ -128,6 +128,7 @@ let activeDrag = null;
 let pointerWasDrag = false;
 let lastTapAt = 0;
 let cursorPosition = { x: -9999, y: -9999 };
+let imageHeistCooldownUntil = 0;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -379,6 +380,26 @@ function createStyles() {
     .zzz { position: absolute; right: 16px; top: 8px; color: rgba(96, 67, 43, 0.86); font: 700 13px/1 "Segoe UI", sans-serif; letter-spacing: 0.04em; opacity: 0; transform: translateY(3px); transition: opacity 180ms ease, transform 180ms ease; text-shadow: 0 1px 0 rgba(255,255,255,0.45); }
     .buddy[data-mood="sleepy"] .zzz { opacity: 1; transform: translateY(0); }
     .shadow { position: absolute; left: 26px; bottom: 10px; width: 46px; height: 12px; border-radius: 999px; background: rgba(33, 18, 10, 0.18); filter: blur(6px); }
+    .loot {
+      position: absolute;
+      left: 40px;
+      top: 34px;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(236, 224, 212, 0.96));
+      border: 2px solid rgba(41, 27, 18, 0.16);
+      box-shadow: 0 8px 20px rgba(40, 18, 6, 0.18);
+      object-fit: cover;
+      opacity: 0;
+      transform: translateY(6px) rotate(8deg) scale(0.84);
+      transition: opacity 180ms ease, transform 180ms ease;
+      pointer-events: none;
+    }
+    .buddy[data-loot="true"] .loot {
+      opacity: 1;
+      transform: translateY(0) rotate(10deg) scale(1);
+    }
     @keyframes breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(1px) scale(0.985); } }
     @keyframes work { 0%, 100% { transform: rotate(0deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(-2px); } }
     @keyframes walk-cycle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px) translateX(1px); } }
@@ -428,6 +449,7 @@ function createMarkup() {
           <div class="sparkles"><div class="spark"></div><div class="spark"></div><div class="spark"></div></div>
           <div class="impact"></div>
           <div class="shadow"></div>
+          <img class="loot" alt="" />
           <div class="halo"></div>
           <div class="zzz">Zz</div>
           <div class="workshop"><div class="crate"></div><div class="coin"></div><div class="progress"><div class="progress-fill"></div></div></div>
@@ -477,6 +499,7 @@ function mountBuddy() {
   const scene = shadowRoot.querySelector(".scene");
   const bubble = shadowRoot.querySelector(".bubble");
   const progressFill = shadowRoot.querySelector(".progress-fill");
+  const loot = shadowRoot.querySelector(".loot");
 
   let settings = { ...DEFAULT_SETTINGS };
   let stats = { ...DEFAULT_STATS };
@@ -487,6 +510,8 @@ function mountBuddy() {
   let intervalId = null;
   let roamingTimer = null;
   let homePosition = { x: 0, y: 0 };
+  let lootTimer = null;
+  let stolenImageTarget = null;
 
   function getBuddyPosition() {
     return {
@@ -528,6 +553,58 @@ function mountBuddy() {
     chrome.storage.local.set({ buddySettings: settings });
   }
 
+  function clearLoot() {
+    window.clearTimeout(lootTimer);
+    lootTimer = null;
+    stolenImageTarget = null;
+    loot.removeAttribute("src");
+    loot.style.removeProperty("width");
+    loot.style.removeProperty("height");
+    buddy.dataset.loot = "false";
+  }
+
+  function isStealableImage(image) {
+    if (!(image instanceof HTMLImageElement)) return false;
+    if (!image.currentSrc || !image.complete) return false;
+    if (image.closest(`#${ROOT_ID}`)) return false;
+    if (image.closest("button, a, input, textarea, select, label")) return false;
+
+    const rect = image.getBoundingClientRect();
+    if (rect.width < 28 || rect.height < 28 || rect.width > 220 || rect.height > 220) return false;
+    if (rect.bottom < 0 || rect.right < 0 || rect.top > window.innerHeight || rect.left > window.innerWidth) return false;
+
+    return true;
+  }
+
+  function attemptImageHeist() {
+    if (!settings.enabled || buddy.hidden || activeDrag || rewardReady) return;
+    if (Date.now() < imageHeistCooldownUntil) return;
+    if (Date.now() < activityUntil) return;
+    if (stolenImageTarget) return;
+    if (Math.random() > 0.18) return;
+
+    const images = Array.from(document.images).filter(isStealableImage);
+    if (!images.length) return;
+
+    const image = images[Math.floor(Math.random() * images.length)];
+    const rect = image.getBoundingClientRect();
+    const size = clamp(Math.round(Math.min(rect.width, rect.height, 42)), 20, 42);
+
+    stolenImageTarget = image;
+    loot.src = image.currentSrc;
+    loot.style.width = `${size}px`;
+    loot.style.height = `${size}px`;
+    buddy.dataset.loot = "true";
+    buddy.dataset.mood = "proud";
+    imageHeistCooldownUntil = Date.now() + 18000;
+    showMessage("Hehe. Borrowing this.", 1200);
+
+    lootTimer = window.setTimeout(() => {
+      buddy.dataset.mood = buddy.dataset.state === "active" ? "focused" : "calm";
+      clearLoot();
+    }, 3600);
+  }
+
   function applySettings() {
     currentAnchorIndex = getAnchorIndexByName(settings.anchor);
     const theme = themeMap[settings.theme] || themeMap.workshop;
@@ -541,6 +618,9 @@ function mountBuddy() {
       : resolveAnchorPosition(currentAnchorIndex);
 
     buddy.hidden = !settings.enabled;
+    if (!settings.enabled) {
+      clearLoot();
+    }
     setDirection(getBuddyPosition().x || nextPosition.x, nextPosition.x);
     setBuddyPosition(nextPosition);
     homePosition = { ...nextPosition };
@@ -647,6 +727,7 @@ function mountBuddy() {
     buddy.dataset.state = "active";
     buddy.dataset.mood = "proud";
     progressFill.style.width = `${momentum}%`;
+    clearLoot();
     showMessage(pickLine(settings.personality, "collect"), 1600);
   }
 
@@ -698,6 +779,7 @@ function mountBuddy() {
       if (settings.positionMode === "custom") {
         setBuddyPosition(settings.gravityDrop ? { x: homePosition.x, y: getFloorY() } : homePosition);
       }
+      attemptImageHeist();
     }, 900);
   }
 
@@ -865,6 +947,7 @@ function mountBuddy() {
   });
 
   setupStorageSync();
+  window.addEventListener("beforeunload", clearLoot);
   return host;
 }
 
